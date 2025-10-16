@@ -1,0 +1,371 @@
+/* Dark, rich horizontal carousel with easy theme switching
+   File: Food-dark-horizontal.css
+   - Default: سبز تیره (theme-green). برای قرمز از .theme-red استفاده کن
+   - کارت‌ها رنگ متفاوتی دارند
+   - فونت: Inter و هارمونی وزن‌ها
+   - RTL-friendly
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+:root{
+  /* تم پیش‌فرض (سبز تیره). برای تم قرمز از کلاس .theme-red روی .food-section استفاده کن */
+  --bg-1: #032018; /* very dark green-blue */
+  --bg-2: #043225; /* slightly lighter */
+
+  /* رنگ آیتم‌ها (کنتراست با بک‌گراند) */
+  --item-1: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  --item-2: linear-gradient(180deg, rgba(10,40,30,0.6), rgba(6,30,22,0.4));
+
+  --accent: #6be19a; /* سبز روشن برای اکسن */
+  --muted: rgba(255,255,255,0.82);
+  --glass: rgba(255,255,255,0.03);
+}
+
+/* تم قرمز (برای استفاده: <section class="food-section theme-red">) */
+.food-section.theme-red{
+  --bg-1: #2b0508; /* deep maroon */
+  --bg-2: #3a0a0c; /* deep red */
+  --item-2: linear-gradient(180deg, rgba(30,6,6,0.6), rgba(40,8,8,0.45));
+  --accent: #ff6b6b; /* warm red accent */
+}
+
+/* تنظیم فونت و پایه */
+.food-section{
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  padding: 2.2rem 1rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(11,37,30,0.55), transparent),
+              linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  color: var(--muted);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+.food-message{
+  font-size: 1.03rem;
+  color: rgba(255,255,255,0.86);
+  margin-bottom: 1rem;
+  text-align: center;
+  direction: rtl;
+  backdrop-filter: blur(4px);
+  font-weight: 500;
+}
+
+/* HORIZONTAL CAROUSEL */
+.food-carousel{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(300px, 1fr);
+  gap: 1.1rem;
+  width: 100%;
+  max-width: 1400px;
+  padding: 1rem 1.2rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.food-carousel::-webkit-scrollbar{height:10px}
+.food-carousel::-webkit-scrollbar-thumb{background: rgba(255,255,255,0.06); border-radius:10px}
+.food-carousel::-webkit-scrollbar-track{background: transparent}
+
+/* CARD */
+.food-card{
+  background: var(--item-1);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px rgba(2,6,10,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+  overflow: hidden;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  transition: transform 0.42s cubic-bezier(.2,.9,.2,1), box-shadow 0.42s;
+  cursor: pointer;
+  scroll-snap-align: center;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+.food-card:focus{outline: 3px solid rgba(107,225,154,0.12)}
+
+.food-card:hover{
+  transform: translateY(-12px) rotateY(5deg) scale(1.015);
+  box-shadow: 0 30px 70px rgba(2,6,10,0.85);
+}
+
+.card-inner{
+  display: flex;
+  flex-direction: column;
+  transform: translateZ(24px);
+  height: 100%;
+}
+
+/* IMAGE */
+.card-avatar{
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  transition: transform 0.45s ease, filter 0.45s ease;
+  display: block;
+}
+
+.food-card:hover .card-avatar{transform: scale(1.06); filter: saturate(1.06) contrast(1.03)}
+
+.card-body{
+  padding: 1.05rem 1.1rem;
+  text-align: right;
+  direction: rtl;
+  background: var(--item-2);
+}
+
+.card-title{
+  font-size: 1.16rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.45rem;
+  letter-spacing: 0.2px;
+}
+
+.card-desc{
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.86);
+  line-height: 1.55;
+  max-height: 4.4rem;
+  overflow: hidden;
+}
+
+.card-meta{
+  display:flex;
+  gap:0.5rem;
+  margin-top:0.9rem;
+  align-items:center;
+}
+
+.tag{
+  background: rgba(255,255,255,0.03);
+  padding: 0.28rem 0.58rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.88);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* accent underline for title */
+.card-title::after{
+  content: '';
+  display: block;
+  width: 46px;
+  height: 3px;
+  margin-top: 0.6rem;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06), var(--accent));
+}
+
+.empty-placeholder{
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px dashed rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.78);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px){
+  .food-carousel{ grid-auto-columns: minmax(280px, 1fr); }
+  .card-avatar{height:190px}
+}
+
+@media (max-width: 768px){
+  .food-carousel{grid-auto-columns: minmax(260px, 86vw); gap: 0.9rem}
+  .card-avatar{height:170px}
+  .card-title{font-size:1.04rem}
+  .card-desc{font-size:0.92rem}
+}
+
+@media (max-width: 480px){
+  .food-section{padding:1.2rem 0.6rem}
+  .food-message{font-size:0.98rem}
+  .food-carousel{gap:0.8rem}
+  .food-card{border-radius:12px}
+  .card-avatar{height:150px}
+}
+
+/* quick helper: change accent color dynamically via attribute or class */
+.food-section[data-accent] { --accent: attr(data-accent color); }
+
+/* پایان */
+
+
+
+
+
+
+
+
+
+
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+.restorant-section {
+  background: linear-gradient(160deg, #101820, #182c28);
+  color: #f3f3f3;
+  padding: 2rem 1rem;
+  font-family: "Inter", sans-serif;
+  direction: rtl;
+}
+
+.res-loading,
+.res-message,
+.res-error {
+  text-align: center;
+  font-size: 1rem;
+}
+
+.res-error {
+  color: #ff7070;
+  font-weight: 600;
+}
+
+.restorant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.restorant-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  padding: 1.2rem;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.restorant-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.res-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #a3ffcb;
+  margin-bottom: 0.4rem;
+}
+
+.res-desc {
+  font-size: 0.95rem;
+  color: #ddd;
+  margin-bottom: 0.5rem;
+}
+
+.res-phone {
+  font-size: 0.9rem;
+  color: #8fe3a6;
+}
+
+.res-likes {
+  font-size: 0.9rem;
+  color: #ff8b8b;
+  margin-bottom: 0.6rem;
+}
+
+.res-btn {
+  background: linear-gradient(90deg, #00bfa6, #00ff87);
+  border: none;
+  color: #081518;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  transition: background 0.4s;
+}
+
+.res-btn:hover {
+  background: linear-gradient(90deg, #00ff87, #00bfa6);
+}
+
+.res-empty {
+  text-align: center;
+  font-size: 1rem;
+  opacity: 0.7;
+  padding: 2rem 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at top left, #071422, #0b1d1b);
+  color: #fff;
+  min-height: 100vh;
+}
+
+.home-header {
+  text-align: center;
+  padding: 2rem 1rem 1rem;
+}
+
+.home-header h1 {
+  font-size: 2rem;
+  color: #00ff99;
+}
+
+.home-header p {
+  font-size: 1rem;
+  color: #aaa;
+}
+
+.home-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1300px;
+  padding: 1rem;
+}
+
+
+
+
+
+@media (max-width: 768px) {
+  .food-card,
+  .restorant-card {
+    min-width: 90vw; /* عرض کارت روی موبایل */
+  }
+
+  .food-section,
+  .restorant-section {
+    padding: 12px;
+  }
+
+  h1, h2, h3 {
+    font-size: clamp(1rem, 4vw, 1.4rem);
+  }
+}

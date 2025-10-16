@@ -1,0 +1,50 @@
+services:
+  db:
+    image: mysql:latest
+    container_name: delino_db_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: gralt1234
+      MYSQL_DATABASE: delino2
+      MYSQL_USER: delino_user
+      MYSQL_PASSWORD: gralt1234
+    volumes:
+      - dbs_data:/var/lib/mysql
+    ports:
+      - "3311:3306"
+
+  web:
+    image: delino
+    build: .
+    restart: always
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8004:8008"
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env
+    command: ["/wait-for-it.sh", "db:3306", "--", "python", "manage.py", "runserver", "0.0.0.0:8008"]
+
+  
+
+  frontend:
+    build:
+      context: ./frontend/delino
+    container_name: frontend_delino_container
+    ports:
+      - "3001:3000"  # در مرورگر: localhost:3001
+    volumes:
+      - ./frontend/delino:/app
+      - /app/node_modules  # جلوگیری از overwrite شدن node_modules
+    depends_on:
+      - web
+    environment:
+      - CHOKIDAR_USEPOLLING=true  # برای هات‌ریلود داخل Docker
+
+
+
+
+volumes:
+  dbs_data: {}
