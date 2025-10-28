@@ -17,12 +17,47 @@ from .serializer import RestorantSerializer, LikeSerializer, OrderGetSerializer,
 from delino.authentication import CustomTokenAuthentication
 
 
-class Search(APIView):
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.db.models import Q
+from .models import Restorant, Food, MenuItem  # مطمئن شو importها درست هستن
 
-    def post(self,request,name):
-        search = Restorant.objects.filter(Q(name__icontains=name) | Q(foods__name__icontains=name)).distinct()
-        serializer = RestorantSerializer(search,many=True)
-        return Response(serializer.data)
+class Search(APIView):
+    def post(self, request, name):
+        # ۱. پیدا کردن رستوران‌هایی که خودشون اسمشون شامل name هست
+        restorants = Restorant.objects.filter(name__icontains=name)
+
+        # ۲. پیدا کردن غذاهایی که اسمشون شامل name هست
+        foods = Food.objects.filter(name__icontains=name)
+
+        # ۳. ساخت دادهٔ JSON برای رستوران‌ها
+        rest_data = [
+            {
+                "id": r.id,
+                "name": r.name,
+                "type": "restorant",
+                "description": r.description,
+            }
+            for r in restorants
+        ]
+
+        # ۴. برای هر غذا، پیدا کردن رستوران‌هایی که اون غذا رو دارند
+        food_data = []
+        for f in foods:
+            # همه‌ی منوهایی که این غذا رو دارند
+            menus = MenuItem.objects.filter(food=f).select_related("restorant")
+            for menu in menus:
+                food_data.append({
+                    "id": f.id,
+                    "name": f.name,
+                    "type": "food",
+                    "description": f.description,
+                    "restorant_id": menu.restorant.id,   # ✅ حالا درست شد
+                    "restorant_name": menu.restorant.name,  # اختیاری
+                })
+
+        return Response(rest_data + food_data)
+
 
 
 
@@ -116,7 +151,7 @@ class OrderView(APIView):
         other_order_data = OrderGetSerializer(other_orders, many=True).data
 
         return Response({'orders':order_data,
-                         'other_order':other_order_data})
+                         'other_orders':other_order_data})
 
 
 class OrderPostView(APIView):
@@ -139,5 +174,13 @@ class OrderPostView(APIView):
 class FoodView(ReadOnlyModelViewSet):
     serializer_class = FoodSerializer
     queryset = Food.objects.all()
+
+
+
+class FoodResView(APIView):
+    def get(self,request,pk):
+        res = Restorant.objects.filter(foods__pk=pk)
+        serializer = RestorantSerializer(res,many=True)
+        return Response(serializer.data,status=200)
 
 

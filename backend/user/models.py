@@ -53,7 +53,7 @@ class Comment(models.Model):
     res = models.ForeignKey(Restorant,related_name='comments',on_delete=models.CASCADE)
     description = models.TextField(max_length=250)
     created_time = models.DateTimeField(auto_now_add=True)
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.full_name

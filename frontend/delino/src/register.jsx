@@ -1,34 +1,31 @@
 import React, { useState } from "react";
 import axios from "axios";
 import * as yup from "yup";
-import {useNavigate} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 const Register = () => {
   const [user, setUser] = useState({ phone_number: "", password: "" });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ ولیدیشن خیلی ساده
   const schema = yup.object({
-        phone_number: yup
-            .string()
-            .matches(/^(?:09\d{9}|989\d{9})$/, 'شماره معتبر نیست')
-            .required('شماره تلفن الزامی است'),
-        password: yup.string().required('رمز عبور الزامی است'),
-    });
+    phone_number: yup
+      .string()
+      .matches(/^(?:09\d{9}|989\d{9})$/, "شماره معتبر نیست")
+      .required("شماره تلفن الزامی است"),
+    password: yup.string().required("رمز عبور الزامی است"),
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // پاک‌کردن خطا قبلی
+    setError("");
 
     try {
-      // فقط اعتبارسنجی ساده
       await schema.validate(user);
 
       setSending(true);
@@ -43,10 +40,8 @@ const Register = () => {
       }
     } catch (err) {
       if (err.name === "ValidationError") {
-        // خطای yup
         setError(err.message);
       } else {
-        // خطای axios
         setError("خطایی در ارتباط با سرور رخ داد");
       }
     } finally {
@@ -57,35 +52,51 @@ const Register = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      style={{
-        maxWidth: "400px",
-        margin: "2rem auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-      }}
+      className="register-form"
+      aria-label="فرم ثبت‌نام"
     >
-      <input
-        type="text"
-        name="phone_number"
-        value={user.phone_number}
-        onChange={handleChange}
-        placeholder="شماره تلفن"
-      />
+      <div className="register-card">
+        <h2 className="register-title">ثبت‌نام</h2>
 
-      <input
-        type="password"
-        name="password"
-        value={user.password}
-        onChange={handleChange}
-        placeholder="رمز عبور"
-      />
+        <div className="register-fields">
+          <input
+            className="register-input"
+            type="text"
+            name="phone_number"
+            value={user.phone_number}
+            onChange={handleChange}
+            placeholder="شماره تلفن"
+            aria-label="شماره تلفن"
+          />
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+          <input
+            className="register-input"
+            type="password"
+            name="password"
+            value={user.password}
+            onChange={handleChange}
+            placeholder="رمز عبور"
+            aria-label="رمز عبور"
+          />
+        </div>
 
-      <button type="submit" disabled={sending}>
-        {sending ? "در حال ارسال..." : "ثبت‌نام"}
-      </button>
+        {error && <p className="register-error" role="alert">{error}</p>}
+
+        <div className="register-actions">
+          <button
+            className="register-btn"
+            type="submit"
+            disabled={sending}
+            aria-busy={sending}
+          >
+            {sending ? "در حال ارسال..." : "ثبت‌نام"}
+          </button>
+        </div>
+
+        <p className="login-register">اکانت داری؟ <Link to="/login">ورود کن</Link></p>
+      </div>
+
+
     </form>
   );
 };

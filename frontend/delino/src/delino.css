@@ -1,301 +1,5171 @@
-/* Dark, rich horizontal carousel with easy theme switching
-   File: Food-dark-horizontal.css
-   - Default: سبز تیره (theme-green). برای قرمز از .theme-red استفاده کن
-   - کارت‌ها رنگ متفاوتی دارند
-   - فونت: Inter و هارمونی وزن‌ها
-   - RTL-friendly
+/* =============================
+   main-thematic.css
+   Light base + colorful accents + textured white background
+   (Search styles preserved at end)
+   ============================= */
+
+/* Reset / base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { height: 100%; }
+body {
+  font-family: "Poppins", "Noto Sans Arabic", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background-color: #ffffff; /* base white */
+  color: #0b1220;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.45;
+}
+
+/* =================
+   Palette (change these to tune theme)
+   ================= */
+:root{
+  --bg: #ffffff;
+  --muted: #6b7280;
+  --text: #0b1220;
+  --card-radius: 14px;
+  --shadow-soft: 0 8px 28px rgba(12,18,28,0.08);
+  --shadow-strong: 0 20px 50px rgba(12,18,28,0.12);
+
+  /* vibrant accent palette (special) */
+  --accent-purple: #6a11cb;
+  --accent-blue:   #2575fc;
+  --accent-green:  #00c853;
+  --accent-coral:  #ff6b6b;
+
+  --accent-grad: linear-gradient(90deg,var(--accent-purple), var(--accent-blue));
+  --accent-grad-2: linear-gradient(90deg,var(--accent-green), var(--accent-coral));
+}
+
+/* =================
+   Decorative textured white background
+   - soft radial color blobs
+   - faint diagonal stripes (low opacity)
+   ================= */
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  /* combine multiple subtle layers */
+  background-image:
+    /* soft radial color blobs */
+    radial-gradient(600px 400px at 10% 10%, rgba(106,17,203,0.06), transparent 12%),
+    radial-gradient(480px 360px at 95% 20%, rgba(37,117,252,0.05), transparent 14%),
+    radial-gradient(420px 320px at 30% 85%, rgba(0,200,83,0.04), transparent 14%),
+    /* faint warm spot */
+    radial-gradient(900px 480px at 70% 70%, rgba(255,107,107,0.03), transparent 18%),
+    /* subtle diagonal stripes texture */
+    repeating-linear-gradient(135deg, rgba(10,12,20,0.01) 0 2px, rgba(255,255,255,0) 2px 16px);
+  background-blend-mode: normal, normal, normal, normal, overlay;
+  mix-blend-mode: normal;
+}
+
+/* slight page overlay to keep contrast stable */
+body::after{
+  content:"";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.02));
+}
+
+/* Ensure app content sits above decorations */
+.app-root, .home-page, #root { position: relative; z-index: 5; }
+
+/* =================
+   Layout containers
+   ================= */
+.app-root, .home-page {
+  min-height: 100vh;
+  padding-bottom: 48px;
+  background: transparent;
+}
+
+/* center max-width */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* =================
+   NAVBAR — vibrant & alive
+   - colored logo mark, animated subtle gradient
+   ================= */
+.navbar {
+  position: sticky;
+  top: 12px;
+  z-index: 220;
+  margin: 12px auto;
+  max-width: 1200px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: space-between;
+  box-shadow: var(--shadow-soft);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.95));
+  border: 1px solid rgba(12,18,28,0.04);
+  backdrop-filter: blur(6px);
+}
+
+/* brand */
+.navbar-brand {
+  font-weight: 800;
+  font-size: 1.08rem;
+  color: var(--accent-purple);
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* colorful mark with subtle motion */
+.navbar-brand::before{
+  content: "";
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: conic-gradient(from 200deg, var(--accent-purple), var(--accent-blue), var(--accent-green), var(--accent-coral));
+  box-shadow: 0 10px 30px rgba(37,99,235,0.08);
+  transition: transform .32s ease;
+}
+.navbar:hover .navbar-brand::before { transform: rotate(8deg) scale(1.02); }
+
+/* navbar layout subsections */
+.nav-inner { display:flex; align-items:center; gap:12px; width:100%; }
+.nav-left { display:flex; align-items:center; gap:12px; }
+.nav-center { flex: 1 1 560px; display:flex; justify-content:center; }
+.nav-right { display:flex; gap:10px; align-items:center; }
+
+/* action buttons */
+.btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding: 8px 12px; border-radius: 10px; font-weight:700;
+  cursor: pointer; border: none; transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 6px 18px rgba(12,18,28,0.06);
+}
+
+/* login / register */
+.login-btn {
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,245,250,0.9));
+  color: var(--accent-purple);
+  border: 1px solid rgba(12,18,28,0.04);
+}
+.register-btn {
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(39,109,250,0.08);
+}
+.btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-strong); }
+
+/* welcome badge */
+.welcome {
+  color: var(--text);
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(250,250,250,0.9), rgba(245,245,250,0.9));
+  border: 1px solid rgba(12,18,28,0.03);
+}
+
+/* =================
+   Home header
+   ================= */
+.home-header { max-width:1200px; margin: 28px auto 18px; text-align:center; padding: 0 16px; }
+.home-header h1 {
+  font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+  color: var(--text);
+  margin-bottom: 8px;
+  display:inline-block;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(250,250,255,0.95), rgba(245,245,250,0.95));
+  box-shadow: 0 12px 30px rgba(12,18,28,0.03);
+}
+.home-header p { color: var(--muted); }
+
+/* =================
+   Card surfaces (food + restaurent)
+   - colored left accent bar + subtle gradient
+   ================= */
+.card-inner, .res-inner {
+  background: linear-gradient(180deg,#fff,#fbfdff);
+  border-radius: var(--card-radius);
+  border: 1px solid rgba(12,18,28,0.04);
+  box-shadow: var(--shadow-soft);
+  transition: transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .28s;
+  display:flex; flex-direction:column; overflow: visible;
+  position: relative;
+}
+
+/* left accent */
+.card-inner::before, .res-inner::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 6px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(106,17,203,1), rgba(37,117,252,1));
+  box-shadow: 0 6px 18px rgba(106,17,203,0.06);
+}
+
+/* hover lift */
+.card-inner:hover, .res-inner:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-strong);
+}
+
+/* content layout */
+.card-body, .res-body {
+  padding: 12px;
+  display:flex; flex-direction:column; gap:8px; flex:1 1 auto; min-height:0;
+}
+.card-title, .res-title { font-weight:700; color: var(--text); margin:0; font-size:1rem; }
+.card-desc, .res-desc { color: var(--muted); font-size:0.95rem; line-height:1.4; }
+
+/* media area */
+.card-media { height:140px; border-radius: 10px; overflow:hidden; background: rgba(15,23,42,0.02); }
+.card-avatar { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* meta bottom */
+.card-meta, .res-meta { margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.card-cta, .res-btn {
+  border-radius: 999px; padding: 8px 12px; font-weight:700; border:none;
+  background: var(--accent-grad); color:#fff; cursor:pointer; box-shadow: 0 10px 30px rgba(37,117,252,0.08);
+}
+.card-cta:hover, .res-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-strong); }
+
+/* adjust accent per section (subtle variety) */
+.restorant-section .res-inner::before { background: linear-gradient(180deg, var(--accent-green), var(--accent-coral)); }
+
+/* consistent min-height */
+.food-section .card-inner, .restorant-section .res-inner { min-height: 260px; }
+
+/* =================
+   Carousels (horizontal) — compact, crisp
+   ================= */
+.food-section {
+  width:100%; padding: 10px 0 26px; box-sizing: border-box; margin: 6px auto;
+}
+.food-carousel-wrap, .restorant-carousel-wrap { position: relative; overflow: visible; }
+.food-carousel {
+  display:grid; grid-auto-flow: column; grid-auto-columns: minmax(220px,260px); gap: 14px;
+  padding: 12px 56px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+}
+.food-card { scroll-snap-align: center; width:100%; }
+.card-inner { padding-left: 18px; } /* leave room for accent bar */
+
+/* rest grid */
+.restorant-section { width:100%; max-width:1200px; margin: 10px auto 40px; padding: 8px 0; }
+.restorant-grid { display:grid; grid-auto-flow:column; grid-auto-columns: minmax(240px,280px); gap:14px; padding:12px 64px; overflow-x:auto; }
+
+/* empty placeholder */
+.empty-placeholder { padding:14px; border-radius:12px; text-align:center; color:var(--muted); background: rgba(15,23,42,0.02); }
+
+/* arrows */
+.carousel-nav { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:999px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index: 30; box-shadow: 0 8px 28px rgba(16,24,40,0.06); background: var(--accent-grad); color:#fff; }
+.carousel-nav.left { left:12px; } .carousel-nav.right { right:12px; }
+
+/* =================
+   Res detail page (light themed)
+   ================= */
+.res-page { max-width: 900px; margin: 24px auto; padding: 18px; }
+.res-hero { display:flex; gap:12px; align-items:flex-start; }
+.res-page h1 { font-size: 1.6rem; color: var(--text); margin-bottom:8px; }
+.res-foods-list li { list-style:none; background: #fff; border-radius: 12px; padding:12px; box-shadow: var(--shadow-soft); display:flex; gap:12px; align-items:center; }
+
+/* comments */
+.comments-list li { list-style:none; padding:10px; border-radius:10px; background: rgba(15,23,42,0.02); }
+
+/* message */
+.status-message { margin-top:10px; color: var(--accent-blue); font-weight:700; }
+
+/* =================
+   Accessibility & responsive
+   ================= */
+a, button { text-decoration:none; }
+:focus { outline: 3px solid rgba(37,99,235,0.12); outline-offset: 3px; }
+
+@media (max-width:1024px){
+  .nav-center { padding: 0 14px; }
+  .food-carousel { padding: 12px 38px; grid-auto-columns: minmax(72vw,72vw); }
+  .restorant-grid { padding: 12px 40px; grid-auto-columns: minmax(72vw,72vw); }
+  .res-inner, .card-inner { min-height: 260px; }
+}
+@media (max-width:600px){
+  .navbar { margin: 8px; padding:10px; border-radius:10px; }
+  .nav-center { order: 3; width:100%; justify-content:flex-start; }
+  .nav-right { order:2; gap:8px; }
+  .nav-left { order:1; }
+  .food-carousel, .restorant-grid { padding: 10px 20px; grid-auto-columns: minmax(86vw,86vw); }
+  .card-media { height:160px; }
+}
+
+/* =========================
+   Envelope hover reveal (card integration)
+   Insert at end of main-thematic.css
+   ========================= */
+
+/* ensure media area is positioned */
+.card-media { position: relative; height: 140px; display:flex; align-items:center; justify-content:center; }
+
+/* envelope wrapper (fits inside card-media) */
+.letter-image {
+  position: relative;
+  width: 160px;    /* tuned to card size */
+  height: 120px;
+  cursor: pointer;
+  display: block;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* animated mail container */
+.animated-mail {
+  position: absolute;
+  width: 160px;
+  height: 120px;
+  transition: transform .4s;
+  transform-origin: center;
+}
+
+/* body triangle (front bottom) */
+.animated-mail .body {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 80px 160px; /* scaled from original 100/200 */
+  border-color: transparent transparent #e95f55 transparent;
+  z-index: 3;
+}
+
+/* top fold (the flap that opens) */
+.animated-mail .top-fold {
+  position: absolute;
+  top: 40px; /* scaled */
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 40px 80px 0 80px; /* scaled */
+  transform-origin: 50% 0%;
+  transition: transform .4s .4s, z-index .2s .4s;
+  border-color: #cf4a43 transparent transparent transparent;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* back fold under the letter */
+.animated-mail .back-fold {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 160px;
+  height: 80px; /* scaled */
+  background: #cf4a43;
+  z-index: 1;
+}
+
+/* left fold accent */
+.animated-mail .left-fold {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 40px 0 40px 80px; /* scaled */
+  border-color: transparent transparent transparent #e15349;
+  z-index: 4;
+}
+
+/* the visible letter (white card that slides up) */
+.animated-mail .letter {
+  position: absolute;
+  left: 12px; /* small inset */
+  bottom: 0;
+  width: 136px;   /* 160 - padding */
+  height: 48px;
+  background: #ffffff;
+  z-index: 5;
+  overflow: hidden;
+  transition: height .4s .2s;
+  border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(3,10,18,0.12);
+}
+
+/* decorative stripe at top of the letter */
+.animated-mail .letter-border {
+  height: 8px;
+  width: 100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    #cb5a5e,
+    #cb5a5e 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+/* title area on the closed letter (we show the food name here) */
+.animated-mail .letter-title {
+  margin-top: 8px;
+  margin-left: 8px;
+  height: 12px;
+  width: 80%;
+  background: transparent;
+  color: #cb5a5e;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: block;
+  line-height: 1;
+  padding-top: 2px;
+}
+
+/* optional small context bar */
+.animated-mail .letter-context {
+  margin-top: 8px;
+  margin-left: 8px;
+  height: 8px;
+  width: 40%;
+  background: transparent;
+}
+
+/* stamp decoration */
+.animated-mail .letter-stamp {
+  position: absolute;
+  right: 8px;
+  top: 56px;
+  border-radius: 50%;
+  height: 26px;
+  width: 26px;
+  background: #cb5a5e;
+  opacity: 0.2;
+}
+
+/* revealed image: sits underneath the envelope parts */
+.animated-mail .revealed-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 160px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity .36s .12s, transform .36s .12s;
+  box-shadow: 0 10px 28px rgba(3,10,18,0.18);
+}
+
+/* shadow under envelope */
+.shadow {
+  position: absolute;
+  top: calc(100% - 10px);
+  left: 50%;
+  width: 160px;
+  height: 18px;
+  transform: translateX(-50%);
+  border-radius: 100%;
+  background: radial-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.0));
+  transition: width .4s, transform .4s;
+  z-index: 0;
+}
+
+/* ---------- Hover interactions ---------- */
+/* when hovering the letter-image, move mail down slightly and open flap */
+.letter-image:hover .animated-mail { transform: translateY(20px); }
+.letter-image:hover .animated-mail .top-fold {
+  transition: transform .4s, z-index .2s;
+  transform: rotateX(180deg);
+  z-index: 0;
+}
+
+/* expand the letter to reveal content and show the image */
+.letter-image:hover .animated-mail .letter {
+  height: 180px; /* expands to reveal more area */
+}
+
+.letter-image:hover .animated-mail .revealed-img {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  z-index: 2;
+}
+
+/* shrink shadow when open (more realistic) */
+.letter-image:hover .shadow { width: 120px; transform: translateX(-50%) scale(0.9); }
+
+/* smooth transition when pointer leaves */
+.letter-image, .animated-mail, .animated-mail .letter, .animated-mail .revealed-img,
+.shadow, .animated-mail .top-fold { transition-timing-function: cubic-bezier(.2,.9,.2,1); }
+
+/* small screens: make envelope slightly smaller */
+@media (max-width: 600px) {
+  .card-media { height: 160px; }
+  .letter-image { width: 140px; height: 106px; }
+  .animated-mail { width: 140px; height: 106px; }
+  .animated-mail .body { border-width: 0 0 70px 140px; }
+  .animated-mail .top-fold { border-width: 35px 70px 0 70px; top: 36px; }
+  .animated-mail .back-fold { width: 140px; height: 70px; }
+  .animated-mail .letter { left: 10px; width: 120px; height: 44px; }
+  .animated-mail .revealed-img { width: 140px; height: 106px; }
+  .shadow { width: 140px; }
+}
+/* ----- envelope: concise, hover target is .letter-image ----- */
+
+.card-media { display:flex; align-items:center; justify-content:center; }
+
+/* envelope wrapper is the hover target */
+.letter-image {
+  width: 150px;
+  height: 104px;
+  margin: 0 auto;
+  cursor: pointer;
+  display: block;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* container */
+.animated-mail {
+  position: relative;
+  width: 150px;
+  height: 104px;
+  transition: transform .4s;
+  transform-origin: center;
+}
+
+/* front triangle */
+.animated-mail .body {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 74px 150px;
+  border-color: transparent transparent #e95f55 transparent;
+  z-index: 3;
+}
+
+/* top flap */
+.animated-mail .top-fold {
+  position: absolute;
+  top: 38px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 38px 75px 0 75px;
+  transform-origin: 50% 0%;
+  transition: transform .4s .3s, z-index .2s .3s;
+  border-color: #cf4a43 transparent transparent transparent;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* back and left folds */
+.animated-mail .back-fold {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 150px;
+  height: 74px;
+  background: #cf4a43;
+  z-index: 1;
+}
+.animated-mail .left-fold {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 38px 0 38px 75px;
+  border-color: transparent transparent transparent #e15349;
+  z-index: 4;
+}
+
+/* letter/front cover (small, transparent background; title sits on it) */
+.animated-mail .letter {
+  position: absolute;
+  left: 12px;
+  bottom: 0;
+  width: 126px;
+  height: 44px;
+  background: transparent; /* no white box */
+  z-index: 7;
+  overflow: visible;
+  transition: transform .36s .12s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 6px;
+}
+
+/* decorative stripe */
+.animated-mail .letter-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 8px;
+  width: 100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    #cb5a5e,
+    #cb5a5e 6px,
+    transparent 6px,
+    transparent 12px
+  );
+}
+
+/* title on envelope — visible and centered */
+.animated-mail .letter-title {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+  padding: 4px 6px;
+  z-index: 8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* revealed image sits UNDER envelope parts */
+.animated-mail .revealed-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  height: 104px;
+  object-fit: cover;
+  border-radius: 8px;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  transition: opacity .36s .12s, transform .36s .12s;
+  box-shadow: 0 8px 22px rgba(3,10,18,0.16);
+}
+
+/* shadow */
+.letter-image .shadow {
+  position: absolute;
+  top: calc(100% - 10px);
+  left: 50%;
+  width: 150px;
+  height: 18px;
+  transform: translateX(-50%);
+  border-radius: 100%;
+  background: radial-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.0));
+  transition: width .4s, transform .4s;
+  z-index: 0;
+}
+
+/* ---------- interactions ----------
+   IMPORTANT: hover is on .letter-image (the whole envelope),
+   and .open class mirrors hover for touch devices.
+-------------------------------------*/
+.letter-image:hover .animated-mail,
+.letter-image.open .animated-mail {
+  transform: translateY(20px);
+}
+
+/* open the flap */
+.letter-image:hover .animated-mail .top-fold,
+.letter-image.open .animated-mail .top-fold {
+  transform: rotateX(180deg);
+  z-index: 0;
+  transition: transform .4s, z-index .2s;
+}
+
+/* lift the small title up (no white box expansion) */
+.letter-image:hover .animated-mail .letter,
+.letter-image.open .animated-mail .letter {
+  transform: translateY(-44px);
+}
+
+/* reveal image */
+.letter-image:hover .animated-mail .revealed-img,
+.letter-image.open .animated-mail .revealed-img {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  z-index: 3;
+}
+
+/* shrink shadow a bit */
+.letter-image:hover .shadow,
+.letter-image.open .shadow {
+  width: 120px;
+  transform: translateX(-50%) scale(0.92);
+}
+
+/* responsive tweaks */
+@media (max-width: 600px) {
+  .letter-image { width: 130px; height: 90px; }
+  .animated-mail { width: 130px; height: 90px; }
+  .animated-mail .body { border-width: 0 0 68px 130px; }
+  .animated-mail .top-fold { border-width: 34px 65px 0 65px; top: 34px; }
+  .animated-mail .back-fold { width: 130px; height: 68px; }
+  .animated-mail .letter { left: 10px; width: 110px; height: 42px; }
+  .animated-mail .revealed-img { width: 130px; height: 90px; }
+  .letter-image .shadow { width: 130px; }
+}
+
+/* Ensure the .letter-meta (details shown when open) overlays nicely */
+.letter-meta { display:block; }
+.letter-meta.visible { display:block; }
+
+/* ✅ نمایش کامل و وسط‌چین اسم غذا روی پاکت */
+.animated-mail {
+  position: relative;
+  z-index: 1;
+}
+
+.animated-mail .letter-title {
+  position: absolute;
+  top: 48%; /* میاد وسط عمودی */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1rem;
+  text-align: center;
+  white-space: nowrap;
+  z-index: 10; /* بالاتر از همه */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* flap بالایی نباید روی اسم بیاد */
+.animated-mail .top-fold {
+  z-index: 2 !important;
+}
+
+/* body پایین‌تر از اسم */
+.animated-mail .body,
+.animated-mail .back-fold,
+.animated-mail .left-fold {
+  z-index: 1 !important;
+}
+
+/* مطمئن شو تصویر پشت نامه پایین‌تره */
+.animated-mail .revealed-img {
+  z-index: 0;
+}
+
+/* ✅ اسم غذا دقیق وسط نامه، کامل دیده‌شده، بدون پوشش */
+.animated-mail .letter-title {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1rem;
+  text-align: center;
+  white-space: nowrap;
+  z-index: 10;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* وقتی هاور می‌کنی، اسم محو بشه (چون نامه باز میشه و عکس میاد) */
+.letter-image:hover .animated-mail .letter-title {
+  opacity: 0;
+  transition: opacity .3s ease-in-out;
+}
+
+/* flap بالا (در حالت بسته) نباید اسم رو بپوشونه */
+.animated-mail .top-fold {
+  pointer-events: none;
+  z-index: 2;
+  transform-origin: 50% 0%;
+  transition: transform .4s .3s, z-index .2s .3s;
+}
+
+/* یه ترنزیشن برای برگشت نرم */
+.letter-image:not(:hover) .animated-mail .letter-title {
+  transition: opacity .3s ease-in-out;
+}
+/* =========================
+   Food title OUTSIDE envelope
+   ========================= */
+
+/* wrapper: نام غذا پایین نامه */
+.letter-image + .letter-title-outside {
+  display: block;
+  text-align: center;
+  margin-top: 6px; /* فاصله از نامه */
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #cb5a5e;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transition: opacity 0.28s ease-in-out;
+}
+
+/* وقتی نامه باز شد، اسم هم کمی محو بشه */
+.letter-image.open + .letter-title-outside,
+.letter-image:hover + .letter-title-outside {
+  opacity: 0.5; /* یا 0 اگر بخوای محو کامل */
+}
+
+/* ====== QUICK PATCH: hide the white letter panel only on hover/open ====== */
+
+/* keep normal (closed) appearance as is */
+
+/* on hover/open: make the front letter visually disappear but preserve its transform/height */
+.letter-image:hover .animated-mail .letter,
+.letter-image.open .animated-mail .letter {
+  background: transparent !important;    /* remove white fill */
+  box-shadow: none !important;           /* remove shadow so no visible block */
+  border: none !important;               /* remove any border line */
+  opacity: 0 !important;                 /* fully invisible but still present for animations */
+  pointer-events: none !important;       /* avoid mouse glitches */
+  transition: opacity .28s ease, transform .36s .12s; /* keep smooth transitions */
+}
+
+/* also hide small decorative bits that can leave thin artifacts */
+.letter-image:hover .animated-mail .letter-border,
+.letter-image.open .animated-mail .letter-border,
+.letter-image:hover .animated-mail .letter-stamp,
+.letter-image.open .animated-mail .letter-stamp {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* make sure the revealed image sits above the now-invisible front cover */
+.letter-image:hover .animated-mail .revealed-img,
+.letter-image.open .animated-mail .revealed-img {
+  z-index: 10 !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+/* ensure top-fold doesn't leave a hairline on some browsers:
+   push it slightly behind the revealed image during open */
+.letter-image:hover .animated-mail .top-fold,
+.letter-image.open .animated-mail .top-fold {
+  z-index: 9 !important;
+  box-shadow: none !important;
+}
+
+/* safety: remove 1px outlines that sometimes show up on some engines */
+.letter-image:hover .animated-mail * {
+  outline: none !important;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+/* وقتی نامه باز می‌شه، اسم غذا (title خارج پاکت) کاملاً مخفی بشه */
+.letter-image.open + .letter-title-outside {
+  display: none !important;
+}
+
+/* همچنین اگر هنوز انیمیشن باز شدن در حال اجراست، عنوان داخلی هم پنهان بشه */
+.letter-image.open .animated-mail .letter-title {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* برای اطمینان، وقتی نامه در حال باز شدن (transition) هست هم، title دیده نشه */
+.letter-image.transitioning + .letter-title-outside {
+  display: none !important;
+}
+/* فقط: وقتی متا/دسکرپشن نمایش داده می‌شود، اجازه اسکرول عمودی بده */
+.letter-meta.visible .card-desc {
+  max-height: 160px !important;       /* حداکثر ارتفاع قابل اسکرول */
+  overflow-y: auto !important;        /* فعال کردن اسکرول عمودی */
+  -webkit-overflow-scrolling: touch;  /* اسکرول نرم در تاچ */
+  padding-right: 6px;                 /* فاصله از سمت راست برای اسکرول‌بار */
+  scrollbar-width: thin;              /* Firefox: نازک کردن اسکرول‌بار */
+  scrollbar-color: rgba(12,18,28,0.12) transparent;
+}
+
+/* WebKit scrollbar (Chrome, Safari) — فقط برای بهتر شدن ظاهر */
+.letter-meta.visible .card-desc::-webkit-scrollbar { width: 8px; }
+.letter-meta.visible .card-desc::-webkit-scrollbar-track { background: transparent; }
+.letter-meta.visible .card-desc::-webkit-scrollbar-thumb {
+  background: rgba(12,18,28,0.08);
+  border-radius: 999px;
+  border: 2px solid transparent;
+}
+
+/* موبایل: ارتفاع کمتر برای تناسب با صفحه کوچکتر */
+@media (max-width: 600px) {
+  .letter-meta.visible .card-desc { max-height: 120px !important; }
+}
+
+
+
+
+
+
+
+
+
+
+/* =================
+   SEARCH STYLES (preserved unchanged)
+   Put your Search.css code here — unchanged from before
+   ================= */
+
+/* (Start of preserved Search styles) */
+/* search-navbar.css
+   styles for Navbar + compact SearchBar + Search page results
+   dark glass, neon accents, high-contrast text for animated bg
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-
-:root{
-  /* تم پیش‌فرض (سبز تیره). برای تم قرمز از کلاس .theme-red روی .food-section استفاده کن */
-  --bg-1: #032018; /* very dark green-blue */
-  --bg-2: #043225; /* slightly lighter */
-
-  /* رنگ آیتم‌ها (کنتراست با بک‌گراند) */
-  --item-1: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  --item-2: linear-gradient(180deg, rgba(10,40,30,0.6), rgba(6,30,22,0.4));
-
-  --accent: #6be19a; /* سبز روشن برای اکسن */
-  --muted: rgba(255,255,255,0.82);
-  --glass: rgba(255,255,255,0.03);
+/* --- Navbar layout --- */
+.searchbar-root { width: 100%; max-width: 620px; position: relative; }
+.searchbar-form {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  border-radius: 12px;
+  padding: 8px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(10,12,16,0.70), rgba(8,10,14,0.64));
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 8px 30px rgba(2,6,20,0.55);
 }
 
-/* تم قرمز (برای استفاده: <section class="food-section theme-red">) */
-.food-section.theme-red{
-  --bg-1: #2b0508; /* deep maroon */
-  --bg-2: #3a0a0c; /* deep red */
-  --item-2: linear-gradient(180deg, rgba(30,6,6,0.6), rgba(40,8,8,0.45));
-  --accent: #ff6b6b; /* warm red accent */
+.search-input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent;
+  color: #eef8ff;
+  font-size: 0.95rem;
+}
+.search-input::placeholder { color: rgba(230,240,255,0.55); }
+.search-btn {
+  background: linear-gradient(90deg,#00ff7a,#4ea0ff);
+  border-radius: 10px;
+  border: none;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #021018;
+  box-shadow: 0 8px 20px rgba(78,160,255,0.12);
 }
 
-/* تنظیم فونت و پایه */
-.food-section{
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  padding: 2.2rem 1rem;
-  min-height: 100vh;
+/* --- Dropdown results --- */
+.search-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 10px);
+  background: linear-gradient(180deg, rgba(6,8,12,0.94), rgba(8,10,14,0.92));
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 18px 48px rgba(0,0,0,0.6);
+  border-radius: 12px;
+  max-height: 360px;
+  overflow: auto;
+  padding: 8px;
+  display: none;
+  z-index: 180;
+  scroll-behavior: smooth;
+}
+.search-dropdown.open { display:block; }
+
+.search-item {
   display: flex;
-  flex-direction: column;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
   align-items: center;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(11,37,30,0.55), transparent),
-              linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
-  color: var(--muted);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+  text-decoration: none;
+  color: #eef8ff;
+  transition: background .14s ease, transform .12s ease;
+}
+.search-item + .search-item { margin-top: 6px; }
+
+.search-item:hover {
+  background: linear-gradient(90deg, rgba(78,160,255,0.06), rgba(255,102,179,0.03));
+  transform: translateY(-3px);
 }
 
-.food-message{
-  font-size: 1.03rem;
-  color: rgba(255,255,255,0.86);
-  margin-bottom: 1rem;
-  text-align: center;
-  direction: rtl;
-  backdrop-filter: blur(4px);
-  font-weight: 500;
+/* (End of preserved Search styles) */
+
+
+/* =========================
+  Updated Food + Restorant styles
+  Replace existing .food-carousel / .food-card / .restorant-grid / .restorant-card blocks
+  ========================= */
+
+/* tiny helpers */
+@keyframes floatY {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse {
+  0% { transform: translateY(0) scale(1); box-shadow: 0 10px 30px rgba(37,117,252,0.06); }
+  50% { transform: translateY(-2px) scale(1.02); box-shadow: 0 22px 48px rgba(37,117,252,0.09); }
+  100% { transform: translateY(0) scale(1); box-shadow: 0 10px 30px rgba(37,117,252,0.06); }
 }
 
-/* HORIZONTAL CAROUSEL */
-.food-carousel{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(300px, 1fr);
-  gap: 1.1rem;
+
+
+
+
+
+
+
+
+
+
+/* -------------------------
+   FOOD — centerable horizontal carousel (flex)
+   ------------------------- */
+/* -------------------------
+   FOOD — centerable horizontal carousel (flex)
+   ------------------------- */
+.food-carousel-wrap {
+  position: relative;
   width: 100%;
-  max-width: 1400px;
-  padding: 1rem 1.2rem;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+/* use flex so we can center items when content < container width */
+.food-carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding: 12px 64px;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  justify-content: center; /* centers items when content smaller */
+  align-items: start;
+  background: transparent;
+}
+
+/* scrollbar styling */
+.food-carousel::-webkit-scrollbar { height: 8px; }
+.food-carousel::-webkit-scrollbar-thumb { background: rgba(12,18,28,0.06); border-radius: 8px; }
+
+/* each card is fixed width but responsive */
+.food-card {
+  scroll-snap-align: center;
+  flex: 0 0 260px;
+  max-width: 260px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  transition: transform .28s ease;
+}
+
+/* card surface */
+.card-inner {
+  background: linear-gradient(180deg, #ffffff, #fcfdff);
+  border-radius: 14px;
+  border: 1px solid rgba(12,18,28,0.04);
+  box-shadow: 0 12px 34px rgba(12,18,28,0.06);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+  padding: 12px;
+  transition: transform .32s cubic-bezier(.2,.9,.2,1), box-shadow .32s;
+  will-change: transform;
+}
+
+/* hover: lift card slightly */
+.food-card:hover { z-index: 60; }
+.food-card:hover .card-inner {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 26px 60px rgba(12,18,28,0.12);
+}
+
+/* media */
+.card-media { height: 150px; overflow:hidden; border-radius: 10px; background: var(--muted-plate); }
+.card-avatar { width:100%; height:100%; object-fit: cover; transition: transform .6s ease; }
+.food-card:hover .card-avatar { transform: scale(1.06) translateZ(0); }
+
+/* title with shimmer outline */
+.card-title {
+  position: relative;
+  font-weight: 800;
+  color: #071222;
+  font-size: 1.02rem;
+  margin: 8px 0 6px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.88), rgba(250,250,250,0.88));
+}
+.card-title::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(106,17,203,0.06), rgba(37,117,252,0.06));
+  filter: blur(6px);
+  opacity: .95;
+}
+
+/* description clamp and consistent height */
+.card-desc {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.35em * 3);
+}
+
+/* meta row and CTA pinned to bottom */
+.card-meta { margin-top: auto; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+
+/* -------------------------
+   CARD CTA BUTTON — 3D hover effect
+   ------------------------- */
+.card-cta {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#ff9f43,#ff6b6b);
+  color: #071222;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 14px 40px rgba(255,120,80,0.08);
+  transition: transform .12s ease, box-shadow .12s ease;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.card-cta:hover {
+  transform: translateY(-3px); /* lift on hover */
+  box-shadow: 0 22px 56px rgba(255,120,80,0.12); /* bigger shadow */
+}
+
+.card-cta:active {
+  transform: translateY(0);
+  box-shadow: 0 14px 40px rgba(255,120,80,0.08);
+}
+
+/* small badge (new, popular) */
+.card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(90deg,#ff66b3,#ff8a65);
+  color: #fff;
+  font-weight: 700;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  box-shadow: 0 8px 22px rgba(255,102,179,0.08);
+}
+
+/* responsive tweaks */
+@media (max-width: 900px) {
+  .food-card { flex: 0 0 72vw; max-width: 72vw; }
+  .card-media { height: 170px; }
+}
+@media (max-width: 480px) {
+  .food-card { flex: 0 0 86vw; max-width: 86vw; }
+  .card-media { height: 200px; }
+}
+
+
+
+
+
+
+
+
+
+/* -------------------------
+   RESTORANT — bigger, consistent, more character
+   ------------------------- */
+.restorant-section { width: 100%; max-width: 1200px; margin: 18px auto 42px; padding: 8px 0; box-sizing: border-box; }
+.restorant-carousel-wrap { position: relative; overflow: visible; }
+
+/* use flex-style track too for centering when small */
+.restorant-grid {
+  display: flex;
+  gap: 18px;
+  padding: 14px 64px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  align-items: start;
+  justify-content: center; /* center when content smaller */
+}
+
+/* each restaurent card fixed width but larger */
+.restorant-card {
+  scroll-snap-align: center;
+  flex: 0 0 300px;
+  max-width: 300px;
+  position: relative;
+  z-index: 5;
+}
+
+/* inner surface — strong presence and colored accent ring */
+.res-inner {
+  background: linear-gradient(180deg, #ffffff, #fffdf9);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 18px 46px rgba(12,18,28,0.08);
+  transition: transform .32s cubic-bezier(.2,.9,.2,1), box-shadow .32s;
+  display:flex;
+  flex-direction:column;
+  min-height: 320px;
+  position: relative;
+  overflow: visible;
+}
+
+/* vibrant rim using pseudo-element */
+.res-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px; /* space for rim */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  pointer-events: none;
+  background: conic-gradient(from 210deg, #00c853, #2575fc, #ff6b6b, #6a11cb);
+  opacity: 0.06;
+  z-index: 0;
+}
+
+/* content sits above rim */
+.res-body { position: relative; z-index: 2; display:flex; flex-direction:column; gap:10px; flex:1 1 auto; min-height:0; }
+
+/* title with bold pill */
+.res-title {
+  font-weight: 800;
+  font-size: 1.08rem;
+  color: #071222;
+  display:inline-block;
+  padding:6px 10px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.98));
+  box-shadow: 0 8px 18px rgba(12,18,28,0.04);
+}
+
+/* description clamp */
+.res-desc {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.35em * 4);
+}
+
+/* bottom row: phone + likes + button aligned consistently */
+.res-meta {
+  margin-top: auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+/* action button style — big and clear */
+.res-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#ff9f43,#ff6b6b);
+  color: #071222;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 14px 40px rgba(255,120,80,0.08);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.res-btn:hover { transform: translateY(-3px); box-shadow: 0 22px 56px rgba(255,120,80,0.12); }
+
+/* popular badge top-left */
+.res-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 6;
+  background: linear-gradient(90deg,#ffb86b,#ff6b6b);
+  color: #081018;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: 0 10px 30px rgba(255,140,80,0.08);
+}
+
+/* keep cards same height baseline for visual harmony */
+.food-section .card-inner, .restorant-section .res-inner {
+  min-height: 300px;
+}
+
+/* -------------------------
+   Accessibility / focus / responsive fixes
+   ------------------------- */
+.restorant-grid::-webkit-scrollbar, .food-carousel::-webkit-scrollbar { height: 8px; }
+.restorant-grid::-webkit-scrollbar-thumb, .food-carousel::-webkit-scrollbar-thumb { background: rgba(12,18,28,0.06); border-radius: 8px; }
+
+/* ensure buttons don't jump when desc length differs */
+.card-body, .res-body { display:flex; flex-direction:column; gap:8px; flex:1 1 auto; min-height:0; }
+.card-meta, .res-meta { margin-top:auto; }
+
+/* responsive tuning */
+@media (max-width: 900px) {
+  .food-card { flex: 0 0 72vw; max-width: 72vw; }
+  .restorant-card { flex: 0 0 72vw; max-width: 72vw; }
+  .card-media { height: 170px; }
+  .res-inner { min-height: 340px; padding: 14px; }
+}
+@media (max-width: 480px) {
+  .food-card { flex: 0 0 86vw; max-width: 86vw; }
+  .restorant-card { flex: 0 0 86vw; max-width: 86vw; }
+  .card-media { height: 200px; }
+  .res-inner { min-height: 380px; }
+}
+
+
+
+
+
+
+
+
+/* register.css — vivid, 3D, responsive register form */
+
+/* variables */
+:root{
+  --bg-card: linear-gradient(180deg,#ffffff,#fcfcff);
+  --accent-1: #6a11cb;
+  --accent-2: #2575fc;
+  --accent-3: #00c853;
+  --accent-warm: #ff6b6b;
+  --muted: #6b7280;
+  --text: #071222;
+  --card-radius: 16px;
+  --shadow-soft: 0 12px 28px rgba(12,18,28,0.08);
+  --shadow-strong: 0 26px 60px rgba(12,18,28,0.12);
+  --glass: rgba(255,255,255,0.95);
+}
+
+/* form container — centers on page */
+.register-form{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  min-height: 60vh;
+  direction: rtl; /* keep RTL */
+}
+
+/* card */
+.register-card{
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border-radius: var(--card-radius);
+  padding: 22px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(12,18,28,0.04);
+  transform-style: preserve-3d;
+  transition: transform .36s cubic-bezier(.2,.9,.2,1), box-shadow .36s;
+  overflow: visible;
+}
+
+/* floating subtle highlight on the card */
+.register-card::before{
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: calc(var(--card-radius) + 2px);
+  background: linear-gradient(120deg, rgba(106,17,203,0.06), rgba(37,117,252,0.06), rgba(0,200,83,0.04));
+  filter: blur(14px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* hover lift */
+.register-card:hover{
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-strong);
+}
+
+/* title with animated shimmer stroke */
+.register-title{
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 12px;
+  position: relative;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(250,250,255,0.95));
+  box-shadow: 0 8px 20px rgba(12,18,28,0.04);
+}
+.register-title::after{
+  content: "";
+  position: absolute;
+  left: -6px; right: -6px; top: -6px; bottom: -6px;
+  z-index: -1;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+  opacity: 0.08;
+  filter: blur(8px);
+}
+
+/* fields container */
+.register-fields{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+/* inputs — modern, tactile */
+.register-input{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(12,18,28,0.06);
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  font-size: 1rem;
+  color: var(--text);
+  outline: none;
+  transition: box-shadow .18s ease, transform .12s ease, border-color .12s ease;
+  box-shadow: 0 6px 18px rgba(12,18,28,0.03);
+}
+
+/* placeholder color */
+.register-input::placeholder{ color: #9aa3b2; opacity: 0.95; }
+
+/* focus: neon soft ring + subtle scale */
+.register-input:focus{
+  border-color: rgba(37,117,252,0.75);
+  box-shadow: 0 8px 30px rgba(37,117,252,0.08), 0 0 0 4px rgba(37,117,252,0.06);
+  transform: translateY(-1px);
+}
+
+/* small helper: when invalid show soft red */
+.register-input[aria-invalid="true"]{
+  border-color: rgba(255,99,99,0.85);
+  box-shadow: 0 6px 20px rgba(255,99,99,0.06);
+}
+
+/* error text */
+.register-error{
+  color: #b71c1c;
+  background: rgba(255,200,200,0.06);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid rgba(183,28,28,0.08);
+}
+
+/* actions row */
+.register-actions{
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+/* button — vivid, big and tactile */
+.register-btn{
+  min-width: 160px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 1rem;
+  color: #021018;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent-1));
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 12px 36px rgba(37,117,252,0.12);
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* button hover and active */
+.register-btn:hover{
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 22px 56px rgba(37,117,252,0.14);
+}
+.register-btn:active{
+  transform: translateY(-1px) scale(0.995);
+}
+
+/* loading state: spinner using pseudo-element + dim text */
+.register-btn[disabled]{
+  opacity: 0.98;
+  filter: saturate(0.98);
+  cursor: default;
+  color: rgba(2,8,12,0.6);
+}
+.register-btn[disabled]::after{
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.7);
+  border-right-color: rgba(255,255,255,0.18);
+  animation: spin 0.9s linear infinite;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+/* spinner keyframes */
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* footnote */
+.register-footnote{
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+/* accessibility focus */
+.register-input:focus, .register-btn:focus { outline: none; box-shadow: 0 0 0 4px rgba(37,117,252,0.06); }
+
+/* responsive */
+@media (max-width: 520px){
+  .register-card{ padding: 16px; border-radius: 12px; }
+  .register-input{ padding: 10px 12px; font-size: 0.98rem; }
+  .register-btn{ min-width: 140px; padding: 10px 14px; font-size: 0.98rem; }
+  .register-title{ font-size: 1.12rem; padding: 6px 10px; }
+  .register-form{ padding: 20px 12px; min-height: 50vh; }
+}
+
+/* optional small decorative flourish — top-right colorful orb */
+.register-card::after{
+  content: "";
+  position: absolute;
+  width: 86px;
+  height: 86px;
+  right: -28px;
+  top: -28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(37,117,252,0.16), rgba(106,17,203,0.10), transparent 40%);
+  filter: blur(14px);
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+/* make sure form text readable in dark-mode fallback too */
+@media (prefers-color-scheme: dark){
+  .register-card{ background: linear-gradient(180deg,#081018,#0b1722); border-color: rgba(255,255,255,0.03); }
+  .register-input{ background: rgba(255,255,255,0.02); color: #eef8ff; border: 1px solid rgba(255,255,255,0.04); }
+  .register-title{ color: #eef8ff; background: rgba(255,255,255,0.02); }
+  .register-error{ background: rgba(255,0,0,0.06); color: #ffdede; border-color: rgba(255,0,0,0.06); }
+  .register-btn{ color: #021018; }
+}
+
+
+.login-register {
+  color: #00ff7a;
+  padding-top: 10px;
+}
+
+
+
+
+
+
+/* Fixed and robust res-single.css
+   هدف: رفع مشکلات گزارش‌شده —
+   - کارت را وسط صفحه ثابت می‌کنیم (نه چپ‌چین)
+   - هدر رنگی بدون سفیدی نمایش می‌دهد (hero پوشش کامل با top-radius)
+   - جلوگیری از سفید شدن بخش‌ها با استفاده از شفاف‌سازی و z-index
+   - اندازه و فونت عنوان بزرگ‌تر و خواناتر
+   - تنظیمات responsive و جلوگیری از فرم‌های فول‌عرض
+   - اگر فونت فارسی می‌خواهی، پایین توضیح دادم چگونه اضافه کنی
+
+   جایگزین کامل برای res-single.css
+*/
+
+:root{
+  --bg-page: #f3f6f9;
+  --card-inner-bg: linear-gradient(180deg,#ffffff,#f7f9fc);
+  --accent-1: #6a11cb;
+  --accent-2: #0ea5ff;
+  --accent-3: #00d084;
+  --muted: #6b7280;
+  --text: #0b1220;
+  --card-radius: 16px;
+  --card-shadow: 0 18px 48px rgba(7,12,20,0.06);
+  --card-shadow-strong: 0 28px 80px rgba(7,12,20,0.10);
+  --max-width: 980px;
+  --gap: 18px;
+  --transition: 220ms cubic-bezier(.2,.9,.2,1);
+}
+
+/* page + global font (پیشنهاد شده برای خوانایی فارسی) */
+html, body { height:100%; }
+body { margin:0; background:var(--bg-page); font-family: "Vazir", "IranSans", system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; color:var(--text); }
+
+/* wrapper: مرکز صفحه و جلوگیری از کشیده شدن فرم‌ها */
+.res-wrapper-center {
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding: 28px 12px;
+  box-sizing:border-box;
+  width:100%;
+}
+
+/* card: محدودیت عرض و حاشیه خودکار برای وسط‌چینی */
+.res-card {
+  width: 100%;
+  max-width: var(--max-width);
+  background: var(--card-inner-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: visible; /* allow hero to overflow rounded bg if needed */
+  border: 1px solid rgba(11,18,26,0.06);
+  transition: box-shadow var(--transition), transform var(--transition);
+  display:flex;
+  flex-direction: column;
+  margin: 0 auto; /* extra safety */
+}
+.res-card:hover { transform: translateY(-6px); box-shadow: var(--card-shadow-strong); }
+
+/* HERO: رنگ کامل و بدون بخش سفید روی کارت */
+.res-hero {
+  display:flex;
+  gap: var(--gap);
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 28px 18px 28px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #ffffff;
+  border-top-left-radius: var(--card-radius);
+  border-top-right-radius: var(--card-radius);
+  position: relative;
+  z-index: 2;
+  box-shadow: inset 0 -12px 30px rgba(0,0,0,0.06);
+}
+
+/* Centered variant used by JSX (still compatible) */
+.res-hero--centered { 
+  flex-direction: column;
+  text-align: center;
+  padding: 36px 22px 22px 22px;
+}
+
+/* Ensure hero children don't inherit white backgrounds from elsewhere */
+.res-hero * { background: transparent; }
+
+.res-hero-left { flex: 1 1 auto; min-width: 0; }
+
+/* Title: bigger, weighty and readable */
+.res-title {
+  margin: 0 0 8px 0;
+  font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+  line-height: 1.02;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow: 0 10px 26px rgba(0,0,0,0.20);
+}
+
+.res-sub {
+  margin: 0;
+  opacity: 0.95;
+  font-weight: 600;
+  font-size: clamp(0.98rem, 1.7vw, 1.08rem);
+  color: rgba(255,255,255,0.94);
+}
+
+/* Meta row: center visually but left/right align inside */
+.res-meta-row { margin-top: 14px; display:flex; gap:12px; align-items:center; justify-content:center; }
+.res-meta-center { display:flex; justify-content:space-between; gap:16px; width:100%; max-width:520px; margin: 14px auto 0 auto; }
+
+.res-meta-box {
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 800;
+  display:flex; align-items:center; gap:8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  color:#fff;
+  transition: transform var(--transition);
+}
+.res-meta-box:hover { transform: translateY(-3px); }
+
+.res-phone, .res-likes { font-size: 1rem; }
+
+/* Hero image: keep on the right in desktop, below on mobile */
+.res-hero-media { width:160px; height:110px; flex: 0 0 160px; border-radius:12px; overflow:hidden; box-shadow: 0 10px 28px rgba(0,0,0,0.22); }
+.res-hero-img { width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.35s ease; }
+.res-hero-img:hover { transform: scale(1.04); }
+
+/* Make sure sections don't have white blocks showing over hero */
+.res-section { padding: 18px 22px; border-top: 1px solid rgba(11,18,26,0.04); background: transparent; z-index:1; }
+.section-title { margin: 0 0 12px 0; font-size: 1.05rem; font-weight: 800; color: var(--text); }
+
+/* foods list: subtle cards with soft background to contrast hero */
+.food-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.food-item {
+  display:flex; gap:14px; align-items:flex-start;
+  background: linear-gradient(180deg,#ffffff,#fbfdff);
+  border-radius: 12px; padding:12px; border: 1px solid rgba(11,18,26,0.04);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.food-item:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(7,12,20,0.06); }
+
+.food-left { flex: 0 0 96px; width:96px; height:72px; border-radius:10px; overflow:hidden; background: #f6f8fb; display:flex; align-items:center; justify-content:center; }
+.food-thumb { width:100%; height:100%; object-fit:cover; display:block; }
+.food-right { flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:8px; }
+
+.food-head { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+.food-name { margin:0; font-weight:800; font-size:1.05rem; color:var(--text); white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+.food-price { font-weight:700; color:var(--muted); font-size:0.95rem; }
+.food-desc { margin:0; color:var(--muted); font-size:0.93rem; line-height:1.4; max-height:3.6em; overflow:hidden; }
+
+.food-actions { margin-top:auto; display:flex; gap:8px; }
+.btn { border: none; cursor:pointer; font-weight:800; padding:8px 14px; border-radius:999px; transition: transform var(--transition), box-shadow var(--transition); }
+.btn:hover { transform: translateY(-3px); }
+.btn-order { background: linear-gradient(90deg,var(--accent-2),var(--accent-3)); color:#041018; box-shadow: 0 10px 30px rgba(14,165,255,0.06); }
+
+/* actions + comments */
+.actions-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.btn-like { background: linear-gradient(90deg,#ff758c,#ff9a9e); color:#081018; }
+.btn-dislike { background: linear-gradient(90deg,#fda085,#f6d365); color:#081018; }
+.btn-comment { background: linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#081018; }
+
+/* comments list: softer cards */
+.comments-list { list-style:none; margin:10px 0 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.comment-item { display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:12px; background: linear-gradient(180deg,#ffffff,#fbfdff); border:1px solid rgba(11,18,26,0.04); }
+.avatar { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); font-weight:800; color:#021018; }
+.comment-body { flex:1 1 auto; min-width:0; }
+.comment-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.comment-user { font-weight:800; color:var(--text); }
+.comment-time { color:var(--muted); font-size:0.82rem; }
+.comment-text { margin:8px 0 0 0; color:var(--muted); line-height:1.45; }
+
+/* flash message */
+.res-flash { padding:10px 18px; margin:12px 22px; border-radius:10px; background: linear-gradient(90deg,#9be7a0,#7fe6d7); color:#041018; font-weight:800; }
+
+/* no-data */
+.no-food, .no-comments { color:var(--muted); padding:8px 0; }
+
+/* loading skeleton */
+.res-card--loading { padding:22px; }
+.skeleton { background: linear-gradient(90deg,#eee,#f5f5f5); border-radius:6px; opacity:0.95; }
+.skeleton.title { height:26px; width:60%; margin-bottom:12px; }
+.skeleton.subtitle { height:16px; width:70%; margin-bottom:8px; }
+.skeleton.row { height:14px; width:100%; margin-top:6px; }
+
+/* responsive */
+@media (max-width:900px) {
+  .res-hero { flex-direction: column; align-items:flex-start; gap:12px; padding:22px; }
+  .res-hero-media { width:100%; height:200px; border-radius:12px; overflow:hidden; }
+  .food-left { width:100%; height:160px; flex-basis: auto; border-radius:10px; }
+  .food-item { flex-direction: column; align-items:stretch; }
+  .actions-row { width:100%; justify-content: space-between; }
+  .res-card { margin: 0 10px; }
+}
+
+/* final safety: prevent horizontal scroll by card */
+.res-wrapper-center, .res-card { overflow-x: hidden; }
+
+/* Helper: If you want to load a Persian font (Vazir example), add this to your index.html head:
+<link rel="preload" href="/fonts/Vazir.woff2" as="font" type="font/woff2" crossorigin>
+@font-face { font-family: 'Vazir'; src: url('/fonts/Vazir.woff2') format('woff2'); font-weight: 300 900; font-style: normal; font-display: swap; }
+*/
+/* 3D, bold & elevated restaurant title */
+.res-title {
+  /* فونت پیشنهادی: اگر فونت فارسی مخصوص داری، قبلاً در فایل اضافه کن */
+  font-family: "Vazir", "IranSans", "Vazirmodern", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  /* بزرگ‌تر و برجسته‌تر */
+  font-size: clamp(2rem, 4.2vw, 3.2rem);
+  font-weight: 900;
+  line-height: 1;
+  margin: 0 0 6px 0;
+
+  /* برداریمش یه ذره بالاتر از بقیه */
+  transform: translateY(-8px);
+
+  /* متن گرادیانت با clip - رنگ متن شفاف شده تا گرادیانت دیده بشه */
+  background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,255,255,0.92) 40%, rgba(255,255,255,0.85) 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  /* spacing */
+  letter-spacing: -0.02em;
+  /* برای خوانایی در صورت لود نشدن فونت */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* چند لایه سایه برای حس عمق/۳بعدی */
+  text-shadow:
+    /* subtle highlight */
+    0 1px 0 rgba(255,255,255,0.35),
+    /* thin extrude layers (simulate depth) */
+    1px 1px 0 rgba(0,0,0,0.06),
+    2px 2px 0 rgba(0,0,0,0.06),
+    3px 3px 0 rgba(0,0,0,0.05),
+    5px 5px 10px rgba(3,10,18,0.18),
+    12px 18px 36px rgba(3,10,18,0.14);
+  transition: transform 240ms ease, text-shadow 240ms ease;
+  display: inline-block;
+  position: relative;
+  z-index: 3;
+}
+
+/* وقتی روی هدر hover می‌کنیم، عنوان یه ذره بیشتر بالا بیاد و درخشش افزایشی بگیره */
+.res-hero:hover .res-title {
+  transform: translateY(-12px);
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.45),
+    1px 1px 0 rgba(0,0,0,0.07),
+    3px 3px 0 rgba(0,0,0,0.07),
+    6px 6px 16px rgba(3,10,18,0.20),
+    18px 26px 46px rgba(3,10,18,0.18);
+}
+
+/* اگر می‌خوای متن عنوان واضح‌تر و براق‌تر باشه، می‌تونی پشتش یک خط (stroke) ملایم هم اضافه کنی */
+.res-title--stroked {
+  /* webkit stroke (fallback چنگی به دل نزنه در بعضی مرورگرها) */
+  -webkit-text-stroke: 0.6px rgba(0,0,0,0.08);
+}
+
+/* در موبایل کمی اندازه کاهش یابد تا خط نخورده و ریسپانسیو بماند */
+@media (max-width: 600px) {
+  .res-title {
+    font-size: clamp(1.6rem, 6.2vw, 2.2rem);
+    transform: translateY(-6px);
+  }
+  .res-hero:hover .res-title { transform: translateY(-8px); }
+}
+.actions-and-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* قبلاً احتمالاً کمتر بود */
+}
+/* === منوی افقی غذاها (جدید و درست) === */
+.food-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 10px 0;
+  display: flex;
+  flex-direction: row;         /* کنار هم */
+  flex-wrap: nowrap;           /* نریزن زیر هم */
+  overflow-x: auto;            /* اسکرول افقی فعال */
+  overflow-y: hidden;
+  gap: 16px;                   /* فاصله بین آیتم‌ها */
+  scroll-snap-type: x mandatory; /* اسکرول تمیز کارت‌به‌کارت */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.15) transparent;
+}
+
+/* اسکرول‌بار زیبا در مرورگرهای WebKit */
+.food-list::-webkit-scrollbar {
+  height: 8px;
+}
+.food-list::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+}
+.food-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* هر کارت غذا در یک خط افقی */
+.food-item {
+  flex: 0 0 calc(33.333% - 10px); /* سه‌تا کارت در هر ردیف (پرکننده فضا) */
+  min-width: 240px;                /* حداقل اندازه برای موبایل */
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg,#ffffff,#fbfdff);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid rgba(11,18,26,0.04);
+  transition: transform var(--transition), box-shadow var(--transition);
+  scroll-snap-align: start;
+  box-sizing: border-box;
+}
+.food-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(7,12,20,0.06);
+}
+
+/* تنظیم بخش عکس درون کارت */
+.food-left {
+  width: 100%;
+  height: 140px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f6f8fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.food-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* توضیحات غذا پایین کارت */
+.food-right {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* در موبایل فقط دو کارت در عرض */
+@media (max-width: 700px) {
+  .food-item {
+    flex: 0 0 calc(50% - 10px);
+  }
+}
+
+/* در خیلی موبایل (کوچک) یکی در عرض */
+@media (max-width: 420px) {
+  .food-item {
+    flex: 0 0 90%;
+  }
+}
+/* ==== به‌روزرسانی رنگ کارت و متن غذا ====
+   جایگزین برای .food-item, .food-name, .food-desc, .food-price
+   دکمه‌ها و باقی‌چیزها بدون تغییر باقی می‌ماند
+*/
+
+.food-item {
+  flex: 0 0 calc(33.333% - 10px);
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* رنگ جدید کارت — گرادیانت ملایم با کانتراست کافی */
+  background: linear-gradient(180deg, rgba(6,34,57,0.96), rgba(8,45,74,0.95));
+  /* کمی شفافیت و بافت ملایم برای عمق */
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+  color: #e6f6ff; /* متن روشن روی زمینه تیره */
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: transform var(--transition), box-shadow var(--transition), background 240ms ease;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+}
+
+/* تاکید روی hover با کمی نوردهی */
+.food-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 46px rgba(2,12,24,0.48);
+  background: linear-gradient(180deg, rgba(10,50,90,0.98), rgba(6,34,57,0.96));
+}
+
+/* تصویر داخل کارت کمی لایت‌تر تا خوانایی متن بهتر شود */
+.food-left {
+  width: 100%;
+  height: 140px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 -6px 18px rgba(0,0,0,0.18);
+}
+
+/* نام غذا: برجسته، بزرگ و یکنواخت با سه‌نقطه‌زدن در صورت طولانی بودن */
+.food-name {
+  margin: 0;
+  font-weight: 900;
+  font-size: 1.06rem;
+  color: #fff; /* سفید روشن برای تاکید */
+  line-height: 1.1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  letter-spacing: -0.01em;
+  display: block;
+  text-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+/* قیمت: زیر نام اما با وزن متوسط */
+.food-price {
+  font-weight: 800;
+  color: #9fe6ff; /* رنگ نعنایی روشن برای جدا شدن از نام */
+  font-size: 0.95rem;
+}
+
+/* توضیحات: خوانا، با ارتفاع محدود و رنگ کمتر برجسته برای سلسله‌مراتب */
+.food-desc {
+  margin: 0;
+  color: rgba(230,246,255,0.92); /* کمی نرم‌تر از سفید */
+  font-size: 0.93rem;
+  line-height: 1.45;
+  max-height: 3.2em; /* دو خط تقریبا */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* پایین کارت: نگهدارنده دکمه و فضای متا */
+.food-actions { 
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* اگر خواستی دکمه سفارش رو کمی درخشان‌تر کنم بگو، الان همون استایل قبلی حفظ شده */
+/* ===== استایل روشن، واضح و حرفه‌ای برای کارت‌های غذا ===== */
+.food-item {
+  position: relative;
+  flex: 0 0 calc(33.333% - 10px);
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 60%, #f4f8fb 100%);
+  color: #052338; /* متن تیره و خوانا */
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid rgba(6,22,40,0.06);
+  box-sizing: border-box;
+  transition: transform 260ms cubic-bezier(.2,.9,.3,1), box-shadow 260ms ease;
+  /* چند لایه سایه برای حس عمق ملایم */
+  box-shadow:
+    0 6px 18px rgba(9,30,46,0.06),
+    0 18px 38px rgba(9,30,46,0.06);
+  scroll-snap-align: start;
+  overflow: visible;
+}
+
+/* پایهٔ مبهم زیر کارت برای جدا کردن از پس‌زمینه */
+.food-item::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -10px;
+  height: 12px;
+  border-radius: 10px;
+  background: radial-gradient(ellipse at center, rgba(9,30,46,0.10), rgba(9,30,46,0.03) 50%, transparent 70%);
+  filter: blur(8px);
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* لایهٔ براق بالا (sheen) ملایم برای حالت حرفه‌ای */
+.food-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35));
+  mix-blend-mode: screen;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* هاور: کمی بلند شدن و افزایش سایه (زیاد اغراق نمیکنه) */
+.food-item:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 14px 36px rgba(9,30,46,0.10),
+    0 36px 90px rgba(9,30,46,0.08);
+}
+
+/* تصویر کارت — روشن و واضح */
+.food-left {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  display: block;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, #eef6ff 0%, #ffffff 100%);
+  box-shadow: inset 0 -6px 14px rgba(10,30,46,0.03);
+}
+
+/* خود تصویر همیشه cover */
+.food-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 360ms cubic-bezier(.2,.9,.2,1);
+}
+
+/* هنگام هاور تصویر کمی زوم ملایم */
+.food-item:hover .food-thumb { transform: scale(1.03); }
+
+/* محتوای متن بالای کارت (روی لایهٔ بالا قرار می‌گیرد) */
+.food-right {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  min-height: 78px;
+}
+
+/* نام غذا: برجسته، واضح و بدون نیاز به hover */
+.food-name {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.06rem;
+  color: #07243a; /* تیره‌تر برای خوانایی */
+  line-height: 1.12;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+
+/* قیمت: مشخص و با تأکید اما هماهنگ با پس‌زمینه روشن */
+.food-price {
+  font-weight: 800;
+  color: #0b81a8; /* آبی-فیروزه‌ای برای تاکید */
+  font-size: 0.96rem;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(11,129,168,0.07), rgba(11,129,168,0.03));
+  box-shadow: 0 6px 18px rgba(11,129,168,0.03) inset;
+}
+
+/* توضیحات: نرم‌تر و خوانا، دو خط محدود */
+.food-desc {
+  margin: 0;
+  color: #294452; /* خاکستری-آبی تیره برای خوانایی */
+  font-size: 0.93rem;
+  line-height: 1.45;
+  max-height: 3.0em; /* تقریباً دو خط */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.95;
+}
+
+/* نگهدارنده دکمه/متا در پایین کارت */
+.food-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 3;
+}
+
+/* badge سبک روشن و قابل مشاهده */
+.food-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 4;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffd89b, #ffb86b);
+  color: #081018;
+  box-shadow: 0 8px 20px rgba(255,150,60,0.10);
+  text-transform: uppercase;
+}
+
+/* responsive: کاهش عرض کارت در تبلت/موبایل */
+@media (max-width: 900px) {
+  .food-item { flex: 0 0 calc(50% - 10px); min-width: 200px; }
+}
+@media (max-width: 420px) {
+  .food-item { flex: 0 0 92%; min-width: 180px; }
+}
+/* ===== بهبود hover و خوانایی متن برای کارت‌های روشن ===== */
+
+/* کاهش اثر لایهٔ بالایی (sheen) تا متون رو نشوره */
+.food-item::before {
+  /* قبلاً 30% ارتفاع بود؛ حالا شفاف‌تر و کمتر مزاحم */
+  height: 28%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.28));
+  mix-blend-mode: normal; /* جلوگیری از wash-out متن */
+  opacity: 0.95;
+}
+
+/* متن و بخش راست همیشه روی لایهٔ براق قرار بگیرد */
+.food-right { z-index: 6; position: relative; }
+
+/* افزایش کنتراست نام غذا و اندازه‌ی کمی بزرگتر */
+.food-name {
+  font-weight: 900;
+  font-size: 1.12rem; /* کمی بزرگتر */
+  color: #032231;     /* تیره و واضح */
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.85); /* subtle lift */
+  transition: color 180ms ease, transform 240ms cubic-bezier(.2,.9,.2,1);
+}
+
+/* وقتی موس یا فوکوس هست، نام برجسته‌تر و کمی scale می‌شود */
+.food-item:hover .food-name,
+.food-item:focus-within .food-name {
+  color: #021726;
+  transform: translateY(-2px) scale(1.01);
+  text-shadow: 0 6px 18px rgba(2,8,18,0.06);
+}
+
+/* توضیحات خواناتر — کمی تیره‌تر و با spacing بهتر */
+.food-desc {
+  color: #274751; /* تیره‌تر برای خوانایی */
+  font-size: 0.94rem;
+  line-height: 1.5;
+  transition: color 160ms ease;
+}
+
+/* روی هاور توضیحات هم کمی تیره‌تر می‌شود */
+.food-item:hover .food-desc,
+.food-item:focus-within .food-desc {
+  color: #203b42;
+}
+
+/* تصویر هنگام hover کمی واضح‌تر (هرگز باعث محو متن نشود) */
+.food-item:hover .food-thumb {
+  transform: scale(1.04);
+  filter: saturate(1.03) contrast(1.02);
+}
+
+/* افزایش سایهٔ کارت هنگام hover تا کارت واضح‌تر از پس‌زمینه بیرون بزنه */
+.food-item:hover {
+  transform: translateY(-10px);
+  box-shadow:
+    0 18px 44px rgba(9,30,46,0.12),
+    0 42px 120px rgba(9,30,46,0.08);
+}
+
+/* وقتی کارت در حالت فوکوس کیبورد باشه، حلقهٔ دسترس‌پذیری واضح */
+.food-item:focus-within,
+.food-item:focus {
+  outline: none;
+  box-shadow:
+    0 18px 44px rgba(9,30,46,0.12),
+    0 42px 120px rgba(9,30,46,0.08),
+    0 0 0 4px rgba(11,129,168,0.10);
+}
+
+/* مطمئن شویم که لایهٔ براق پایین‌تر از متن قرار می‌گیره */
+.food-item::before { z-index: 2; }
+.food-left { z-index: 3; }
+.food-right { z-index: 6; }
+.food-actions { z-index: 6; }
+
+/* اگر می‌خوای پشت نام یه پس‌زمینه‌ی کوچک بذاریم برای خوانایی بیشتر (اختیاری)
+   کامنت رو بردار تا فعال بشه */
+.food-name--highlight {
+  background: rgba(255,255,255,0.70);
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: #022033;
+  display: inline-block;
+}
+
+/* موبایل: کمی بازتر کردن فونت برای خوانایی */
+@media (max-width: 420px) {
+  .food-name { font-size: 1.02rem; }
+  .food-desc { font-size: 0.95rem; }
+}
+/* ===== Title & description: حرفه‌ای، خوانا و برجسته ===== */
+
+/* Title container (no JSX change needed) */
+.food-name {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 6px 12px 6px 44px;    /* فضای سمت چپ برای نوار اکسانت */
+  font-weight: 900;
+  font-size: 1.18rem;            /* بزرگ‌تر برای تاکید */
+  line-height: 1.05;
+  color: #041826;                /* تیره و کاملاً قابل خواندن */
+  letter-spacing: -0.005em;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,249,252,0.88));
+  box-shadow: 0 6px 18px rgba(9,30,46,0.04);
+  -webkit-font-smoothing: antialiased;
+  z-index: 6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: transform 200ms ease, box-shadow 200ms ease, color 160ms ease;
+}
+
+/* Accent bar on the left of the title */
+.food-name::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 44px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #0ea5ff, #00c2a8);
+  box-shadow: 0 6px 18px rgba(14,165,255,0.12);
+  z-index: 5;
+}
+
+/* subtle text "stroke" and depth to ensure legibility on any background */
+.food-name {
+  -webkit-text-stroke: 0.3px rgba(4,24,30,0.06);
+  text-shadow:
+    0 6px 18px rgba(2,8,12,0.04),
+    0 1px 0 rgba(255,255,255,0.6); /* light lift */
+}
+
+/* Hover / focus: بیشتر برجسته بشه بدون اینکه متن ناپدید بشه */
+.food-item:hover .food-name,
+.food-item:focus-within .food-name {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px rgba(9,30,46,0.08);
+  color: #021826;
+}
+
+/* Price badge (کنار عنوان یا زیر آن بسته به ساختار) */
+.food-price {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-weight: 800;
+  font-size: 0.94rem;
+  color: #013243;
+  background: linear-gradient(90deg, rgba(11,129,168,0.10), rgba(11,129,168,0.04));
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(11,129,168,0.02) inset;
+  vertical-align: middle;
+}
+
+/* Description: دو خط، فاصله بهتر و رنگِ مناسب برای خوانایی */
+.food-desc {
+  margin: 0.25rem 0 0 0;
+  color: #254a52;         /* خاکستری-آبی تیره برای خوانایی */
+  font-size: 0.96rem;
+  line-height: 1.45;
+  max-height: 3.0em;      /* حدود دو خط */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 150ms ease, transform 180ms ease;
+  z-index: 6;
+  padding-right: 6px;     /* فاصله از لبه */
+}
+
+/* هنگام هاور/فوکوس توضیحات کمی برجسته‌تر شوند */
+.food-item:hover .food-desc,
+.food-item:focus-within .food-desc {
+  color: #132f35;
+  transform: translateY(-1px);
+}
+
+/* اگر خواستی عنوان را در دو خط نمایش بده (غیر از همیشگی)، این کلاس را فعال کن:
+   .food-name.multiline { white-space: normal; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; }
+*/
+
+/* responsive: در موبایل اندازه عنوان کمی کوچکتر اما خوانا */
+@media (max-width: 420px) {
+  .food-name { font-size: 1.04rem; padding-left: 38px; }
+  .food-desc { font-size: 0.95rem; }
+}
+/* ===== Res-hero: bigger, clearer, meta-row on top and address below =====
+   Paste this at the END of your CSS file to override previous rules.
+*/
+
+/* make the hero area larger and more monumental */
+.res-hero {
+  padding: 56px 32px 28px 32px;
+  min-height: 220px;
+  align-items: flex-start;
+  gap: 20px;
+  background: linear-gradient(90deg, #4b1fb0 0%, #0ea5ff 60%);
+  box-shadow: inset 0 -20px 56px rgba(0,0,0,0.16);
+}
+
+/* larger, higher-contrast restaurant title used in JSX as res-title2 */
+.res-title2 {
+  font-weight: 900;
+  line-height: 1;
+  font-size: clamp(2.2rem, 5.2vw, 4rem); /* bigger */
+  margin: 0 0 6px 0;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-image: linear-gradient(90deg, #ffffff 0%, rgba(255,255,255,0.96) 40%);
+  text-shadow: 0 14px 44px rgba(2,8,20,0.36);
+  transition: transform 220ms ease, text-shadow 220ms ease;
+}
+
+/* subtitle larger and clearer */
+.res-sub {
+  font-weight: 700;
+  font-size: clamp(1rem, 1.8vw, 1.12rem);
+  color: rgba(255,255,255,0.95);
+  margin: 0 0 12px 0;
+  text-shadow: 0 6px 22px rgba(3,10,18,0.18);
+}
+
+/* meta-row: keep the three chips on top, allow wrapping so address can go to next line */
+.res-hero .res-meta-row {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 980px;
+  flex-wrap: wrap; /* allow address to drop below */
+  margin-top: 12px;
+  padding: 0 6px;
+  box-sizing: border-box;
+}
+
+/* base chip bigger and more 3D */
+.res-hero .res-meta-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-weight: 900;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 14px 42px rgba(2,6,12,0.22);
+  min-width: 160px;
+  justify-content: center;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+/* phone on the left (visually) */
+.res-hero .res-phone {
+  order: 1;
+  min-width: 220px;
+  justify-content: flex-start;
+  padding-left: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+}
+.res-hero .res-phone strong,
+.res-hero .res-phone span { color: #fff; font-weight:900; }
+
+/* time pill center: big, white pill to be prominent */
+.res-hero .res-time {
+  order: 2;
+  min-width: 300px;
+  max-width: 56%;
+  padding: 14px 20px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffffff, #f7fcff);
+  color: #032733;
+  font-weight: 900;
+  box-shadow: 0 20px 60px rgba(2,16,26,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
+  justify-content: center;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+/* larger "clock" visual */
+.res-hero .res-time::before {
+  content: "⏱";
+  display:inline-block;
+  font-size:1.12rem;
+  padding:6px;
+  border-radius:999px;
+  background: linear-gradient(90deg,#ffd89b,#ffb86b);
+  box-shadow: 0 8px 26px rgba(255,150,60,0.12);
+}
+
+/* like badge on the right */
+.res-hero .res-likes {
+  order: 3;
+  min-width: 140px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: linear-gradient(90deg,#fff1f1,#fff7f7);
+  color: #9b2b2b;
+  box-shadow: 0 16px 44px rgba(176,42,42,0.10);
+  justify-content: center;
+  display: inline-flex;
+  gap: 10px;
+}
+
+/* make chips pop on hover/focus */
+.res-hero .res-meta-box:hover,
+.res-hero .res-meta-box:focus {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 80px rgba(2,6,12,0.26);
+}
+
+/* -------------------------
+   Move the address visually *below* the three chips (full-width masterpiece)
+   even if it's inside the same DOM row — we force it to a full row.
+   ------------------------- */
+.res-hero .res-address {
+  /* force to full width row */
+  flex: 1 1 100%;
+  order: 99; /* after the chips */
+  margin-top: 18px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: linear-gradient(180deg,#ffffff,#fbfeff);
+  color: #082a32;
+  box-shadow: 0 22px 64px rgba(2,12,20,0.10);
+  border: 1px solid rgba(6,22,40,0.06);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-start;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+/* address accent bar and icon */
+.res-hero .res-address::before {
+  content: "";
+  width: 8px;
+  height: 56px;
+  border-radius: 6px;
+  background: linear-gradient(180deg,#0ea5ff,#00c2a8);
+  box-shadow: 0 10px 28px rgba(14,165,255,0.10);
+  margin-left: 4px;
+  transform: translateX(-8px);
+}
+.res-hero .res-address::after {
+  content: "📍";
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+/* ensure address text wraps nicely */
+.res-hero .res-address > * {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* responsive: on small screens stack everything vertically and enlarge tap targets */
+@media (max-width: 880px) {
+  .res-hero {
+    padding: 36px 18px 22px 18px;
+    min-height: auto;
+  }
+  .res-hero .res-meta-row { gap: 12px; }
+  .res-hero .res-phone,
+  .res-hero .res-time,
+  .res-hero .res-likes {
+    min-width: auto;
+    width: 100%;
+    justify-content: space-between;
+    padding: 12px 14px;
+  }
+  .res-hero .res-time { max-width: 100%; order: 2; }
+  .res-hero .res-address { order: 3; margin-top: 12px; }
+  .res-title2 { font-size: clamp(1.6rem, 7.2vw, 2.6rem); }
+}
+
+/* accessibility focus */
+.res-hero .res-meta-box:focus,
+.res-hero .res-meta-box:focus-within {
+  outline: none;
+  box-shadow: 0 18px 48px rgba(2,12,20,0.14), 0 0 0 6px rgba(14,165,255,0.06);
+  transform: translateY(-4px);
+}
+/* ==== Small tweak: بیشتر کردن فاصله بین subtitle و متاها ==== */
+.res-hero .res-sub {
+  /* افزایش فاصله زیرین برای جداسازی واضح */
+  margin-bottom: 28px !important;
+  /* اگر خواستی فاصله بیشتر شه عدد رو تنظیم کن */
+}
+
+/* ==== Make the hero container support subtle 3D perspective ==== */
+.res-hero {
+  perspective: 900px; /* برای اثر سه‌بعدی عنوان */
+  -webkit-perspective: 900px;
+}
+
+/* ==== 3D, beveled & glossy restaurant title (res-title2) ==== */
+.res-hero .res-title2 {
+  position: relative;          /* برای overlay ها */
+  z-index: 6;
+  display: inline-block;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-image: linear-gradient(90deg, #ffffff 0%, #e8f7ff 45%, #d6f3ff 100%);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  /* چند لایه‌ی سایه برای حس عمق / extrusion */
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.65),   /* subtle highlight */
+    0 2px 0 rgba(0,0,0,0.04),
+    0 6px 18px rgba(2,8,20,0.28),
+    0 18px 44px rgba(2,8,20,0.20);
+  transform: translateZ(0) translateY(0);
+  transform-style: preserve-3d;
+  transition: transform 260ms cubic-bezier(.2,.9,.2,1), text-shadow 260ms ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* glossy sheen (ملایم و غیرمخرب به خوانایی) */
+.res-hero .res-title2::before {
+  content: "";
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: -6%;
+  height: 46%;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.12));
+  filter: blur(0.6px);
+  mix-blend-mode: overlay;
+  border-radius: 6px;
+  transform: translateZ(30px) scale(1.03);
+  opacity: 0.95;
+  z-index: 2;
+}
+
+/* subtle "lift" on hero hover — title pops forward */
+.res-hero:hover .res-title2 {
+  transform: translateY(-8px) translateZ(18px) rotateX(.6deg);
+  text-shadow:
+    0 2px 0 rgba(255,255,255,0.72),
+    0 8px 22px rgba(2,8,20,0.30),
+    0 28px 72px rgba(2,8,20,0.28);
+}
+
+/* small 3D drop "base" behind the title (pseudo shadow) */
+.res-hero .res-title2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -8px;
+  height: 18px;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at center, rgba(2,8,20,0.26), rgba(2,8,20,0.08) 45%, transparent 70%);
+  filter: blur(10px);
+  z-index: 1;
+  pointer-events: none;
+  transform: translateZ(-10px);
+}
+
+/* ===== responsive adjustments so big title won't overlap meta on small screens ===== */
+@media (max-width: 880px) {
+  .res-hero .res-sub { margin-bottom: 18px !important; }
+  .res-hero .res-title2 { font-size: clamp(1.6rem, 8.4vw, 2.8rem); }
+  .res-hero .res-title2::before { height: 40%; left: -4%; right: -4%; }
+  .res-hero:hover .res-title2 { transform: none; } /* جلوگیری از اثر بزرگ روی موبایل */
+}
+
+/* Accessibility: وقتی با کیبورد فوکوس شد کمی اثر بصری پیدا کنه */
+.res-hero .res-title2:focus,
+.res-hero .res-title2:focus-visible {
+  outline: none;
+  transform: translateY(-6px) translateZ(16px);
+  box-shadow: 0 0 0 6px rgba(14,165,255,0.06);
+}
+/* ===== FORCE: تضمینی برای بالا بردن عنوان و فاصله با subtitle =====
+   قرار بده در انتهای فایل CSS (آخرین قواعد) و سپس یک hard refresh انجام بده (Ctrl+F5).
+*/
+
+/* دقت: از سلکتورهای با اولویت بیشتر و چند !important برای override استفاده شده */
+.res-card .res-hero .res-title2 {
+  /* بالا بردن عنوان نسبت به حالت قبل */
+  transform: translateY(-22px) translateZ(18px) !important;
+  /* تقویت گرادیانت و stroke برای وضوح بیشتر */
+  background-image: linear-gradient(90deg, #ffffff 0%, #eaf8ff 40%, #d6f3ff 100%) !important;
+  -webkit-text-stroke: 0.45px rgba(2,8,20,0.08) !important;
+  text-shadow:
+    0 2px 0 rgba(255,255,255,0.88),
+    0 10px 26px rgba(2,8,20,0.34),
+    0 30px 82px rgba(2,8,20,0.26) !important;
+  transition: transform 220ms cubic-bezier(.2,.9,.2,1) !important;
+  z-index: 9999 !important;
+  will-change: transform !important;
+}
+
+/* اگر چند قاعده با نام مشابه داری، این هم alternative با attribute to be extra specific */
+.res-card[data-page="restorant"] .res-hero .res-title2,
+.res-hero .res-title2 {
+  /* اندازه هم کمی بزرگتر */
+  font-size: clamp(2.4rem, 5.6vw, 4.2rem) !important;
+  line-height: 1 !important;
+}
+
+/* افزایش فاصله زیر subtitle به‌صورت قاطع */
+.res-card .res-hero .res-sub {
+  margin-bottom: 36px !important; /* بزرگتر کن، اگر لازم شد عدد را افزایش بده */
+  display: block !important;
+  font-size: clamp(1rem, 1.9vw, 1.12rem) !important;
+  opacity: 0.98 !important;
+  text-shadow: 0 6px 22px rgba(3,10,18,0.18) !important;
+}
+
+/* اگر هنوز CSS دیگری بعد از این بارگذاری می شه، این کلاس کمکی را می توانی به DOM اضافه کنی (موقتی):
+   <div class="res-card hero-force"> ... </div>
+   سپس این قاعده را نیز اضافه کن:
+*/
+.res-card.hero-force .res-hero .res-title2 {
+  transform: translateY(-28px) translateZ(22px) !important;
+}
+
+/* موبایل: کمتر کردن کشش تا اورلپ نشود */
+@media (max-width: 880px) {
+  .res-card .res-hero .res-title2 {
+    transform: translateY(-10px) translateZ(0) !important;
+    font-size: clamp(1.6rem, 7.2vw, 2.8rem) !important;
+  }
+  .res-card .res-hero .res-sub { margin-bottom: 18px !important; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.orderpost-container {
+  max-width: 420px;
+  margin: 80px auto;
+  background: linear-gradient(145deg, #ffffff, #f2f2f2);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  color: #333;
+  box-shadow:
+    5px 5px 15px rgba(0, 0, 0, 0.1),
+    -5px -5px 15px rgba(255, 255, 255, 0.7);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.orderpost-container:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    8px 8px 20px rgba(0, 0, 0, 0.15),
+    -8px -8px 20px rgba(255, 255, 255, 0.9);
+}
+
+.orderpost-title {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #ff9800;
+  text-shadow: 0 0 6px rgba(255, 152, 0, 0.3);
+}
+
+.orderpost-info {
+  font-size: 1rem;
+  margin: 6px 0;
+  color: #555;
+}
+
+.orderpost-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.orderpost-label {
+  text-align: right;
+  font-size: 1.1rem;
+  color: #ff9800;
+  font-weight: 500;
+}
+
+.orderpost-input {
+  background: #fafafa;
+  color: #222;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 1.1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: inset 2px 2px 5px #d1d1d1, inset -2px -2px 5px #ffffff;
+}
+
+.orderpost-input:focus {
+  outline: none;
+  border-color: #ff9800;
+  box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+  background: #fff;
+}
+
+.orderpost-button {
+  background: linear-gradient(145deg, #ffb300, #ff9800);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 4px 10px rgba(255, 152, 0, 0.5),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.orderpost-button:hover {
+  background: linear-gradient(145deg, #ffd54f, #ff9800);
+  transform: scale(1.05);
+  box-shadow:
+    0 0 15px rgba(255, 152, 0, 0.6),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.orderpost-message {
+  margin-top: 20px;
+  color: #4caf50;
+  font-weight: bold;
+  text-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 📌 استایل برای بخش اطلاعات رستوران و غذا */
+.orderpost-info {
+  background: linear-gradient(145deg, #ffffff, #f3f3f3);
+  border-radius: 12px;
+  padding: 10px 15px;
+  margin: 10px 0;
+  color: #333;
+  font-size: 1.05rem;
+  font-weight: 500;
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.05),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+  text-align: right;
   position: relative;
 }
 
-.food-carousel::-webkit-scrollbar{height:10px}
-.food-carousel::-webkit-scrollbar-thumb{background: rgba(255,255,255,0.06); border-radius:10px}
-.food-carousel::-webkit-scrollbar-track{background: transparent}
+/* 🔸 آیکون تزئینی قبل از متن */
+.orderpost-info::before {
+  content: "🍽️ ";
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
 
-/* CARD */
-.food-card{
-  background: var(--item-1);
-  border-radius: 16px;
-  box-shadow: 0 18px 50px rgba(2,6,10,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-  overflow: hidden;
-  perspective: 1200px;
-  transform-style: preserve-3d;
-  transition: transform 0.42s cubic-bezier(.2,.9,.2,1), box-shadow 0.42s;
+.orderpost-info:nth-of-type(2)::before {
+  content: "🥘 ";
+}
+
+
+
+
+
+
+/* comment.css — upgraded: bigger input + decorative blobs + tactile 3D */
+/* scoped to .comment-form so بقیه کامپوننت‌ها در امان باشند */
+
+:root{
+  --accent-1: #00d084;
+  --accent-2: #4ea0ff;
+  --accent-3: #ff6b6b;
+  --glass-1: rgba(255,255,255,0.03);
+  --text-light: #e8f8ff;
+  --muted: rgba(232,248,255,0.72);
+  --card-radius: 16px;
+  --soft-shadow: 0 14px 36px rgba(2,8,16,0.48);
+  --inset-shadow: inset 0 2px 10px rgba(255,255,255,0.02);
+}
+
+/* container (grid: input + button) */
+.comment-form{
+  width: 100%;
+  max-width: 920px;
+  margin: 22px auto;
+  padding: 18px;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 14px;
+  align-items: start;
+
+  background: linear-gradient(180deg, rgba(6,10,16,0.82), rgba(10,14,22,0.78));
+  border-radius: calc(var(--card-radius) + 6px);
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: var(--soft-shadow), 0 4px 12px rgba(0,0,0,0.45) inset;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  position: relative;
+  z-index: 10;
+  direction: rtl;
+  transition: transform .22s ease;
+}
+
+/* decorative floating blobs */
+.comment-form::before,
+.comment-form::after{
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  filter: blur(28px);
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  transition: transform .6s ease;
+  z-index: 1;
+}
+.comment-form::before{
+  width: 220px;
+  height: 220px;
+  right: -60px;
+  top: -70px;
+  background: radial-gradient(circle at 30% 30%, rgba(78,160,255,0.28), rgba(0,208,132,0.12) 40%, transparent 60%);
+  transform: rotate(8deg);
+}
+.comment-form::after{
+  width: 160px;
+  height: 160px;
+  left: -40px;
+  bottom: -50px;
+  background: radial-gradient(circle at 70% 30%, rgba(255,107,107,0.22), rgba(78,160,255,0.06) 50%, transparent 70%);
+  transform: rotate(-8deg);
+}
+
+/* subtle animated float on hover of the whole form */
+.comment-form:hover::before{ transform: translateY(-6px) rotate(6deg) scale(1.02); }
+.comment-form:hover::after{ transform: translateY(6px) rotate(-6deg) scale(1.03); }
+
+/* Big tactile input (styled like textarea) */
+.comment-input{
+  grid-column: 1 / 2;
+  width: 100%;
+  min-height: 96px;          /* bigger input */
+  max-height: 220px;
+  padding: 18px 20px;
+  resize: vertical;          /* if browser supports, user can expand */
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color: var(--text-light);
+  font-size: 1.06rem;        /* bigger font */
+  line-height: 1.5;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.6),
+    inset 0 2px 10px rgba(255,255,255,0.02);
+  outline: none;
+  transition: transform 160ms cubic-bezier(.2,.9,.2,1), box-shadow 160ms, border-color 160ms;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+/* placeholder clearer and larger */
+.comment-input::placeholder{
+  color: rgba(232,248,255,0.46);
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+/* focus: big neon rim & lift */
+.comment-input:focus{
+  transform: translateY(-3px);
+  border-color: rgba(78,160,255,0.28);
+  box-shadow:
+    0 22px 56px rgba(2,8,16,0.65),
+    0 0 18px rgba(78,160,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+/* big pill button */
+.comment-btn{
+  grid-column: 2 / 3;
+  justify-self: end;
+  align-self: start;
+  min-width: 140px;
+  height: 56px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #06121a;
+  font-weight: 900;
+  font-size: 1.02rem;
   cursor: pointer;
-  scroll-snap-align: center;
-  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow:
+    0 16px 44px rgba(2,8,16,0.56),
+    0 8px 30px rgba(78,160,255,0.12);
+  transform: translateY(0);
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms, filter 180ms;
+  z-index: 6; /* above decorative blobs */
 }
 
-.food-card:focus{outline: 3px solid rgba(107,225,154,0.12)}
-
-.food-card:hover{
-  transform: translateY(-12px) rotateY(5deg) scale(1.015);
-  box-shadow: 0 30px 70px rgba(2,6,10,0.85);
+/* decorative micro-line to separate input visually */
+.comment-input + .comment-btn::before {
+  /* nothing — fallback for CSS order; kept for clarity */
 }
 
-.card-inner{
+/* hover/active on button */
+.comment-btn:hover{
+  transform: translateY(-8px);
+  filter: saturate(1.05) brightness(1.03);
+  box-shadow:
+    0 30px 70px rgba(2,8,16,0.6),
+    0 12px 36px rgba(78,160,255,0.18);
+}
+.comment-btn:active{
+  transform: translateY(-3px) scale(0.995);
+}
+
+/* message under form */
+.comment-message{
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #041217;
+  background: linear-gradient(90deg,#b9f6d6,#b3e5ff);
+  box-shadow: 0 10px 28px rgba(2,8,16,0.18);
+  animation: messagePop .36s cubic-bezier(.2,.9,.2,1);
+  z-index: 7;
+}
+
+/* small hint line at bottom (CSS-only decorative text) */
+.comment-form::marker{} /* noop to avoid UA marker conflicts */
+.comment-form .comment-hint {
+  display: none; /* kept in case you add an element later */
+}
+
+/* responsive: stack on small screens and enlarge button */
+@media (max-width: 820px){
+  .comment-form{
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+  .comment-btn{
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    width: 100%;
+    height: 56px;
+  }
+  .comment-input{ min-height: 120px; font-size: 1.05rem; }
+  .comment-form::before, .comment-form::after { display: none; } /* hide blobs on tiny screens for clarity */
+}
+
+/* micro animation for message */
+@keyframes messagePop {
+  0% { transform: translateY(8px) scale(0.98); opacity: 0; }
+  60% { transform: translateY(-4px) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* small accessibility outlines */
+.comment-input:focus, .comment-btn:focus {
+  outline: 3px solid rgba(78,160,255,0.12);
+  outline-offset: 4px;
+}
+
+/* ensure no leakage: styles tied to .comment-form only */
+.comment-form * { box-sizing: border-box; }
+/* comment.css — upgraded: bigger input + decorative blobs + tactile 3D */
+/* scoped to .comment-form so بقیه کامپوننت‌ها در امان باشند */
+
+:root{
+  --accent-1: #00d084;
+  --accent-2: #4ea0ff;
+  --accent-3: #ff6b6b;
+  --glass-1: rgba(255,255,255,0.03);
+  --text-light: #e8f8ff;
+  --muted: rgba(232,248,255,0.72);
+  --card-radius: 16px;
+  --soft-shadow: 0 14px 36px rgba(2,8,16,0.48);
+  --inset-shadow: inset 0 2px 10px rgba(255,255,255,0.02);
+}
+
+/* container (grid: input + button) */
+.comment-form{
+  width: 100%;
+  max-width: 920px;
+  margin: 22px auto;
+  padding: 18px;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 14px;
+  align-items: start;
+
+  background: linear-gradient(180deg, rgba(6,10,16,0.82), rgba(10,14,22,0.78));
+  border-radius: calc(var(--card-radius) + 6px);
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: var(--soft-shadow), 0 4px 12px rgba(0,0,0,0.45) inset;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  position: relative;
+  z-index: 10;
+  direction: rtl;
+  transition: transform .22s ease;
+}
+
+/* decorative floating blobs */
+.comment-form::before,
+.comment-form::after{
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  filter: blur(28px);
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  transition: transform .6s ease;
+  z-index: 1;
+}
+.comment-form::before{
+  width: 220px;
+  height: 220px;
+  right: -60px;
+  top: -70px;
+  background: radial-gradient(circle at 30% 30%, rgba(78,160,255,0.28), rgba(0,208,132,0.12) 40%, transparent 60%);
+  transform: rotate(8deg);
+}
+.comment-form::after{
+  width: 160px;
+  height: 160px;
+  left: -40px;
+  bottom: -50px;
+  background: radial-gradient(circle at 70% 30%, rgba(255,107,107,0.22), rgba(78,160,255,0.06) 50%, transparent 70%);
+  transform: rotate(-8deg);
+}
+
+/* subtle animated float on hover of the whole form */
+.comment-form:hover::before{ transform: translateY(-6px) rotate(6deg) scale(1.02); }
+.comment-form:hover::after{ transform: translateY(6px) rotate(-6deg) scale(1.03); }
+
+/* Big tactile input (styled like textarea) */
+.comment-input{
+  grid-column: 1 / 2;
+  width: 100%;
+  min-height: 96px;          /* bigger input */
+  max-height: 220px;
+  padding: 18px 20px;
+  resize: vertical;          /* if browser supports, user can expand */
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  color: var(--text-light);
+  font-size: 1.06rem;        /* bigger font */
+  line-height: 1.5;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.6),
+    inset 0 2px 10px rgba(255,255,255,0.02);
+  outline: none;
+  transition: transform 160ms cubic-bezier(.2,.9,.2,1), box-shadow 160ms, border-color 160ms;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+/* placeholder clearer and larger */
+.comment-input::placeholder{
+  color: rgba(232,248,255,0.46);
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+/* focus: big neon rim & lift */
+.comment-input:focus{
+  transform: translateY(-3px);
+  border-color: rgba(78,160,255,0.28);
+  box-shadow:
+    0 22px 56px rgba(2,8,16,0.65),
+    0 0 18px rgba(78,160,255,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+/* big pill button */
+.comment-btn{
+  grid-column: 2 / 3;
+  justify-self: end;
+  align-self: start;
+  min-width: 140px;
+  height: 56px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #06121a;
+  font-weight: 900;
+  font-size: 1.02rem;
+  cursor: pointer;
+  box-shadow:
+    0 16px 44px rgba(2,8,16,0.56),
+    0 8px 30px rgba(78,160,255,0.12);
+  transform: translateY(0);
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms, filter 180ms;
+  z-index: 6; /* above decorative blobs */
+}
+
+/* decorative micro-line to separate input visually */
+.comment-input + .comment-btn::before {
+  /* nothing — fallback for CSS order; kept for clarity */
+}
+
+/* hover/active on button */
+.comment-btn:hover{
+  transform: translateY(-8px);
+  filter: saturate(1.05) brightness(1.03);
+  box-shadow:
+    0 30px 70px rgba(2,8,16,0.6),
+    0 12px 36px rgba(78,160,255,0.18);
+}
+.comment-btn:active{
+  transform: translateY(-3px) scale(0.995);
+}
+
+/* message under form */
+.comment-message{
+  grid-column: 1 / -1;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #041217;
+  background: linear-gradient(90deg,#b9f6d6,#b3e5ff);
+  box-shadow: 0 10px 28px rgba(2,8,16,0.18);
+  animation: messagePop .36s cubic-bezier(.2,.9,.2,1);
+  z-index: 7;
+}
+
+/* small hint line at bottom (CSS-only decorative text) */
+.comment-form::marker{} /* noop to avoid UA marker conflicts */
+.comment-form .comment-hint {
+  display: none; /* kept in case you add an element later */
+}
+
+/* responsive: stack on small screens and enlarge button */
+@media (max-width: 820px){
+  .comment-form{
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+  .comment-btn{
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    width: 100%;
+    height: 56px;
+  }
+  .comment-input{ min-height: 120px; font-size: 1.05rem; }
+  .comment-form::before, .comment-form::after { display: none; } /* hide blobs on tiny screens for clarity */
+}
+
+/* micro animation for message */
+@keyframes messagePop {
+  0% { transform: translateY(8px) scale(0.98); opacity: 0; }
+  60% { transform: translateY(-4px) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* small accessibility outlines */
+.comment-input:focus, .comment-btn:focus {
+  outline: 3px solid rgba(78,160,255,0.12);
+  outline-offset: 4px;
+}
+
+/* ensure no leakage: styles tied to .comment-form only */
+.comment-form * { box-sizing: border-box; }
+
+
+/* ---------------------------
+   Hover-sparkle animation (adapted)
+   Applies to .comment-btn.fancy
+   --------------------------- */
+
+:root {
+  --color: var(--yellow-5, #ffd54f);
+  --shadow: var(--yellow-8, rgba(255, 165, 0, 0.85));
+  --glare: hsl(0 0% 100% / 0.75);
+  --font-size: 16px;
+  --transition: 0.2s;
+}
+
+/* make sure button is positioned for absolute children */
+.comment-btn.fancy {
+  position: relative;
+  overflow: visible;
+  --padding: 14px;
+  padding: var(--padding) 22px;
+  /* keep existing background / look—existing .comment-btn rules still apply */
+}
+
+/* text spans inside button */
+.comment-btn.fancy span {
+  display: inline-block;
+  font-size: calc(var(--font-size) * 1.05);
+  font-weight: 900;
+  transition: all var(--transition);
+  text-decoration: none;
+  text-shadow:
+    calc(var(--hover) * (var(--font-size) * -0)) calc(var(--hover) * (var(--font-size) * 0)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.02)) calc(var(--hover) * (var(--font-size) * 0.02)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.04)) calc(var(--hover) * (var(--font-size) * 0.04)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.06)) calc(var(--hover) * (var(--font-size) * 0.06)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.08)) calc(var(--hover) * (var(--font-size) * 0.08)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.10)) calc(var(--hover) * (var(--font-size) * 0.10)) var(--shadow);
+  transform: translate(calc(var(--hover) * (var(--font-size) * 0.06)), calc(var(--hover) * (var(--font-size) * -0.06)));
+}
+
+/* the overlay/glare span (second one) */
+.comment-btn.fancy span:last-of-type {
+  position: absolute;
+  inset: var(--padding);
+  background: linear-gradient(
+    108deg,
+    transparent 0 55%,
+    var(--glare) 55% 60%,
+    transparent 60% 70%,
+    var(--glare) 70% 85%,
+    transparent 85%
+  ) calc(var(--pos) * -200%) 0% / 200% 100%, var(--color);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  z-index: 2;
+  text-shadow: none;
+  transform: translate(calc(var(--hover) * (var(--font-size) * 0.06)), calc(var(--hover) * (var(--font-size) * -0.06)));
+  transition: transform 0.2s, background-position 0s;
+}
+
+/* hover variables */
+.comment-btn.fancy {
+  --hover: 0.4;
+  --pos: 0;
+}
+.comment-btn.fancy:hover {
+  --hover: 1;
+  --pos: 1;
+}
+.comment-btn.fancy:active { --hover: 0; }
+
+/* svg sparkles (positioned absolutely inside button) */
+.comment-btn.fancy svg {
+  position: absolute;
+  z-index: 3;
+  width: calc(var(--font-size) * 0.9);
+  aspect-ratio: 1;
+  top: calc(var(--y, 50) * 1%);
+  left: calc(var(--x, 50) * 1%);
+  transform: translate(-50%, -50%) scale(0);
+}
+.comment-btn.fancy svg path { fill: var(--glare); }
+
+/* per-sparkle adjustments (copy of original pattern) */
+.comment-btn.fancy svg:nth-of-type(1){ --x: 0;  --y: 20; --s: 1.1; --d: 1; }
+.comment-btn.fancy svg:nth-of-type(2){ --x: 15; --y: 80; --s: 1.25; --d: 2; }
+.comment-btn.fancy svg:nth-of-type(3){ --x: 45; --y: 40; --s: 1.1; --d: 3; }
+.comment-btn.fancy svg:nth-of-type(4){ --x: 75; --y: 60; --s: 0.9; --d: 2; }
+.comment-btn.fancy svg:nth-of-type(5){ --x: 100;--y: 30; --s: 0.8; --d: 4; }
+
+/* sparkle animation on hover */
+.comment-btn.fancy:hover svg {
+  animation: sparkle 0.75s calc((var(--delay-step) * var(--d)) * 1s) both;
+}
+.comment-btn.fancy svg { --delay-step: 0.15; }
+@keyframes sparkle {
+  50% { transform: translate(-50%, -50%) scale(var(--s, 1)); }
+}
+
+/* adjust transitions for background glide effect */
+.comment-btn.fancy:hover span:last-of-type {
+  transition: transform 0.2s, background-position calc(var(--hover) * 1.5s) calc(var(--hover) * 0.25s);
+}
+
+/* ensure focus outline is still visible (accessibility) */
+.comment-btn.fancy:focus { outline: 3px solid rgba(78,160,255,0.12); outline-offset: 4px; }
+/* Clean fix for Comment button: remove extra overlay text */
+.comment-btn span {
+  display: inline-block; /* معمولی */
+  position: relative;
+  z-index: 4;
+  text-shadow: none !important; /* حذف شادوهای چندگانه */
+  color: #06121a !important;
+}
+
+/* اگر overlay span وجود داره، hide کن */
+.comment-btn span:last-of-type {
+  display: none !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* order.css — dramatic 3D panel for Order component (light theme) */
+:root{
+  --bg-surface: #ffffff;
+  --muted-ink: #6b7280;
+  --text: #071422;
+  --accent-1: #6a11cb; /* purple */
+  --accent-2: #2575fc; /* blue */
+  --accent-3: #00c853; /* green */
+  --glass: rgba(255,255,255,0.88);
+  --card-radius: 16px;
+  --soft-shadow: 0 20px 50px rgba(12,18,28,0.08);
+  --lift-shadow: 0 36px 80px rgba(12,18,28,0.12);
+  --glow: 0 8px 32px rgba(37,117,252,0.08);
+}
+
+/* Panel wrapper */
+.order-panel{
+  max-width: 1200px;
+  margin: 28px auto;
+  padding: 20px;
+  box-sizing: border-box;
+  direction: rtl;
+
+  /* layered backdrop: subtle paper texture + inner glass */
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.6), rgba(248,249,251,0.9)),
+    repeating-linear-gradient(135deg, rgba(0,0,0,0.01) 0 2px, transparent 2px 18px);
+  border-radius: calc(var(--card-radius) + 6px);
+  border: 1px solid rgba(12,18,28,0.06);
+  box-shadow: var(--soft-shadow);
+  position: relative;
+  isolation: isolate;
+}
+
+/* header */
+.order-header{
+  display:flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.order-header h2{ font-size: 1.25rem; color: var(--text); margin:0; }
+.status-message{ color: var(--accent-2); font-weight: 700; margin:0; }
+
+/* sections */
+.orders-section{ margin-bottom: 22px; }
+.orders-section h3{ margin: 8px 0 14px; color: var(--text); font-size: 1.05rem; }
+
+/* grid */
+.orders-grid,
+.other-orders-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+/* order-card — 3D layered card */
+.order-card{
+  position: relative;
+  border-radius: 14px;
+  overflow: visible;
+  cursor: default;
+  transform-style: preserve-3d;
+  transition: transform 320ms cubic-bezier(.2,.9,.2,1), box-shadow 320ms;
+  perspective: 1000px;
+  outline: none;
+}
+
+/* decorative "floating" shadow and depth */
+.order-card::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  z-index: 0;
+  transform: translateZ(-20px) scale(0.98);
+  transition: transform 320ms, opacity 320ms;
+  box-shadow: 0 22px 60px rgba(12,18,28,0.10);
+  pointer-events: none;
+}
+
+/* visual strip — colorful glossy rim */
+.order-card-visual{
+  position: absolute;
+  left: 16px; right: 16px; top: -20px;
+  height: 72px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  filter: blur(8px);
+  opacity: 0.12;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* main body surface — "thick card" look */
+.order-card-body{
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, var(--bg-surface), #fbfdff);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow:
+    0 10px 30px rgba(12,18,28,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  border: 1px solid rgba(12,18,28,0.04);
+  min-height: 160px;
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+  transform: translateZ(0);
+}
+
+/* title & lines */
+.order-title{ margin: 0; font-weight: 800; color: var(--text); font-size: 1.02rem; }
+.order-line{ margin: 0; color: var(--muted-ink); font-size: 0.95rem; }
+.order-line.muted{ color: #9aa3ad; font-size: 0.9rem; }
+
+/* meta row */
+.order-meta{
+  margin-top: auto;
+  display:flex;
+  gap: 12px;
+  align-items:center;
+  justify-content: space-between;
+}
+
+/* status badge variations */
+.status-badge{
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: white;
+  box-shadow: 0 8px 20px rgba(12,18,28,0.06);
+}
+.status-pending{ background: linear-gradient(90deg,#ffd54f,#ffb74d); color:#081018; }
+.status-approved{ background: linear-gradient(90deg,#4caf50,#00c853); }
+.status-cancelled{ background: linear-gradient(90deg,#ff6b6b,#ff8a80); }
+
+/* pay button — tactile 3D */
+.pay-btn{
+  --btn-h: 44px;
+  height: var(--btn-h);
+  min-width: 120px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(90deg,var(--accent-2), var(--accent-3));
+  color: #041217;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 12px 38px rgba(37,117,252,0.10), 0 6px 18px rgba(12,18,28,0.08);
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms;
+}
+.pay-btn:hover{ transform: translateY(-6px) scale(1.02); box-shadow: var(--lift-shadow); }
+.pay-btn:active{ transform: translateY(-2px) scale(.995); }
+.pay-link { text-decoration: none; }
+
+/* focus visible for keyboard users */
+.order-card:focus .order-card-body,
+.order-card:focus-within .order-card-body{
+  box-shadow: 0 18px 44px rgba(37,117,252,0.09), inset 0 1px 0 rgba(255,255,255,0.6);
+  transform: translateY(-6px);
+  outline: none;
+}
+
+/* hover 3D tilt */
+.order-card:hover{
+  transform: translateY(-10px) rotateX(2deg) rotateY(-2deg);
+}
+.order-card:hover::before{
+  transform: translateZ(-8px) scale(1.02);
+  opacity: 0.95;
+}
+
+/* empty state */
+.empty{
+  color: var(--muted-ink);
+  padding: 16px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(12,18,28,0.02), rgba(12,18,28,0.01));
+}
+
+/* responsive tweaks */
+@media (max-width: 900px){
+  .orders-grid{ grid-template-columns: 1fr; }
+  .order-card-body{ min-height: 180px; padding: 16px; }
+  .order-card-visual{ height: 60px; top: -18px; left: 12px; right: 12px; }
+}
+
+/* small accessibility color tweaks for contrast */
+@media (prefers-contrast: more){
+  .order-card-body{ box-shadow: 0 18px 50px rgba(12,18,28,0.14); border-color: rgba(12,18,28,0.08); }
+  .pay-btn{ box-shadow: 0 20px 60px rgba(37,117,252,0.16); }
+}
+
+/* ========================= */
+/* 🎨 سایر رزروها (DELIVERED, SHIPPED, ...) */
+/* ========================= */
+
+.other-orders-grid .order-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: visible;
+  transform-style: preserve-3d;
+  transition: transform 300ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms;
+  perspective: 1000px;
+}
+
+.other-orders-grid .order-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  transform: translateZ(-20px) scale(0.98);
+  transition: transform 320ms, opacity 320ms;
+  box-shadow: 0 22px 60px rgba(12,18,28,0.06);
+  pointer-events: none;
+}
+
+.other-orders-grid .order-card-visual {
+  position: absolute;
+  left: 16px; right: 16px; top: -20px;
+  height: 72px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
+  filter: blur(8px);
+  opacity: 0.10;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* رنگ متفاوت برای سایر رزروها */
+.other-orders-grid .order-card-body {
+  background: linear-gradient(180deg, #fafff9, #f8fffb);
+  border: 1px solid rgba(12,18,28,0.05);
+  box-shadow:
+    0 10px 26px rgba(0, 200, 83, 0.06),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  transition: all 200ms ease;
+}
+
+/* افکت hover */
+.other-orders-grid .order-card:hover {
+  transform: translateY(-10px) rotateX(2deg) rotateY(2deg);
+}
+
+.other-orders-grid .order-card:hover .order-card-body {
+  box-shadow: 0 20px 40px rgba(0,200,83,0.08);
+  transform: translateY(-3px);
+}
+
+/* استایل وضعیت */
+.status-delivered{
+  background: linear-gradient(90deg,#66bb6a,#00c853);
+}
+.status-shipped{
+  background: linear-gradient(90deg,#42a5f5,#00b0ff);
+}
+
+/* دکمه‌های سایر رزروها (درصورت اضافه شدن در آینده) */
+.other-orders-grid .pay-btn{
+  background: linear-gradient(90deg,#43a047,#00c853);
+  color: #fff;
+}
+.other-orders-grid .pay-btn:hover{
+  box-shadow: 0 20px 60px rgba(0,200,83,0.2);
+}
+/* حالت ویژه برای سایر رزروها */
+.visual-other {
+  background: linear-gradient(90deg, #00c853, #4caf50);
+  filter: blur(8px);
+  opacity: 0.12;
+}
+
+/* کارت سایر رزروها کمی آرام‌تر ولی همچنان سه‌
+/* === سایر رزروها - سه بعدی و لوکس === */
+.other-card {
+  background: linear-gradient(135deg, rgba(0,255,204,0.05), rgba(0,0,0,0.02));
+  transition: all 0.35s ease;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 255, 204, 0.12), inset 0 0 1px rgba(255,255,255,0.3);
+}
+
+.other-card:hover {
+  transform: translateY(-10px) rotateX(3deg) rotateY(-2deg);
+  box-shadow: 0 35px 90px rgba(0,255,204,0.2), 0 0 20px rgba(37,117,252,0.15);
+}
+
+.visual-other {
+  background: linear-gradient(90deg, #00c853, #009688, #00e5ff);
+  filter: blur(10px);
+  opacity: 0.15;
+}
+
+/* بدنه مخصوص سایر رزروها */
+.other-body {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 204, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6),
+              0 8px 24px rgba(12,18,28,0.06);
+  padding: 22px;
+  border-radius: 14px;
+}
+
+/* عنوان */
+.other-title {
+  color: #043d35;
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg, #00c853, #009688);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* خطوط اطلاعات */
+.info-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  margin: 8px 0;
+  background: linear-gradient(90deg, rgba(0,255,204,0.05), rgba(0,0,0,0.02));
+  border-radius: 12px;
+  box-shadow: inset 0 1px 2px rgba(0,255,204,0.15);
+}
+
+.info-label {
+  font-weight: 700;
+  color: #00695c;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+}
+
+.info-value {
+  font-weight: 800;
+  color: #004d40;
+  background: rgba(0,255,204,0.15);
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,255,204,0.25);
+}
+
+.info-value.highlight {
+  color: #004b23;
+  background: linear-gradient(90deg, #a7ff83, #64ffda);
+  box-shadow: 0 4px 10px rgba(0,255,204,0.3);
+  font-size: 1.05rem;
+}
+
+/* وضعیت */
+.other-card .status-badge {
+  font-size: 0.85rem;
+  background: linear-gradient(90deg, #26a69a, #00c853);
+  box-shadow: 0 4px 10px rgba(0,255,204,0.25);
+}
+/* ========================= */
+/* 🔰 PENDING ORDERS (ویژه) */
+/* ========================= */
+
+/* کارت مخصوص رزرو در انتظار */
+.pending-card {
+  transform-style: preserve-3d;
+  transition: transform 320ms cubic-bezier(.2, .9, .2, 1), box-shadow 320ms;
+  border-radius: 16px;
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.pending-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  z-index: 0;
+  transform: translateZ(-20px) scale(0.98);
+  box-shadow: 0 22px 60px rgba(255, 180, 0, 0.15);
+  pointer-events: none;
+  transition: transform 320ms, opacity 320ms;
+}
+
+/* نوار براق بالای کارت */
+.visual-pending {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: -20px;
+  height: 72px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #ffb300, #ff9100);
+  filter: blur(8px);
+  opacity: 0.22;
+  z-index: 1;
+}
+
+/* بدنه کارت */
+.pending-body {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, #fffdf5, #fff8e1);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow:
+    0 10px 30px rgba(255, 170, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 200, 0, 0.25);
   display: flex;
   flex-direction: column;
-  transform: translateZ(24px);
-  height: 100%;
+  gap: 10px;
+  transform: translateZ(0);
 }
 
-/* IMAGE */
-.card-avatar{
+/* کلیدها و مقادیر (Key / Value) */
+.pending-body .order-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.96rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.pending-body .order-key {
+  color: #ff8f00;
+  text-shadow: 0 0 6px rgba(255, 165, 0, 0.25);
+}
+
+.pending-body .order-value {
+  color: #3e2723;
+  font-weight: 800;
+  text-shadow: 0 2px 6px rgba(255, 204, 0, 0.25);
+}
+
+/* عدد قیمت کل */
+.pending-body .amount-pill {
+  background: linear-gradient(90deg, #ffb74d, #ff9800);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 900;
+  box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4);
+}
+
+/* افکت Hover و سه‌بعدی */
+.pending-card:hover {
+  transform: translateY(-10px) rotateX(2deg) rotateY(-2deg);
+}
+
+.pending-card:hover::before {
+  transform: translateZ(-8px) scale(1.03);
+  opacity: 0.95;
+}
+
+/* عنوان غذا */
+.pending-body .order-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #ff6f00;
+  text-shadow: 0 2px 10px rgba(255, 160, 0, 0.25);
+}
+
+/* دکمه پرداخت ویژه */
+.pending-body .pay-btn {
+  background: linear-gradient(90deg, #ff9100, #ffb300);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(255, 171, 0, 0.35);
+  border: none;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+}
+
+.pending-body .pay-btn:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 16px 32px rgba(255, 180, 0, 0.45);
+}
+
+.pending-body .pay-btn:active {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(255, 160, 0, 0.4);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* payment.css — holographic 3D receipt (light-friendly & dramatic) */
+:root{
+  --ph-bg: #f6f8fb;
+  --card-bg: #ffffff;
+  --muted: #707b85;
+  --ink: #071422;
+  --accent-a: #6a11cb; /* purple */
+  --accent-b: #2575fc; /* blue */
+  --accent-c: #00c853; /* green */
+  --glass-opacity: 0.92;
+  --card-radius: 18px;
+  --soft-shadow: 0 18px 48px rgba(8,12,20,0.08);
+  --deep-shadow: 0 42px 110px rgba(8,12,20,0.12);
+}
+
+/* shell: centers and gives subtle page-level depth */
+.payment-shell {
   width: 100%;
-  height: 210px;
-  object-fit: cover;
-  transition: transform 0.45s ease, filter 0.45s ease;
-  display: block;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, var(--ph-bg), #ffffff 40%);
 }
 
-.food-card:hover .card-avatar{transform: scale(1.06); filter: saturate(1.06) contrast(1.03)}
-
-.card-body{
-  padding: 1.05rem 1.1rem;
-  text-align: right;
-  direction: rtl;
-  background: var(--item-2);
+/* stage: small framed area with layered lighting */
+.payment-stage{
+  width: 100%;
+  max-width: 820px;
+  border-radius: calc(var(--card-radius) + 6px);
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(255,255,255,var(--glass-opacity)), #fbfcff);
+  box-shadow: var(--soft-shadow);
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
 }
 
-.card-title{
-  font-size: 1.16rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.45rem;
+/* hero: gateway name + subtle floating icon */
+.payment-hero{
+  display:flex;
+  flex-direction: column;
+  gap:8px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+.gateway-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(106,17,203,0.12), rgba(37,117,252,0.08));
+  box-shadow: 0 8px 24px rgba(37,117,252,0.04) inset;
+}
+.gateway-name{
+  font-weight: 800;
+  color: var(--ink);
   letter-spacing: 0.2px;
 }
-
-.card-desc{
+.gateway-desc{
+  color: var(--muted);
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.86);
-  line-height: 1.55;
-  max-height: 4.4rem;
+}
+
+/* body: main area */
+.payment-body{
+  display:flex;
+  gap:20px;
+  align-items: stretch;
+  justify-content: center;
+}
+
+/* waiting / spinner */
+.payment-wait{
+  width:100%;
+  min-height: 220px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+  justify-content:center;
+  color: var(--muted);
+}
+.spinner{
+  width:64px;
+  height:64px;
+  border-radius: 50%;
+  background: conic-gradient(from 120deg, var(--accent-b), var(--accent-a), var(--accent-c), transparent 70%);
+  filter: blur(6px);
+  opacity: 0.85;
+  animation: spin 1.6s linear infinite;
+  box-shadow: 0 12px 40px rgba(37,117,252,0.08);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* receipt-card: main 3D surface */
+.receipt-card{
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 1200px;
+  transition: transform 320ms cubic-bezier(.2,.9,.2,1), box-shadow 320ms;
+  z-index: 2;
+}
+
+/* holographic blurred layer (behind content) */
+.receipt-holo{
+  position:absolute;
+  inset: -18px -24px auto -24px;
+  height: 160px;
+  border-radius: 22px;
+  background: linear-gradient(90deg, rgba(106,17,203,0.12), rgba(37,117,252,0.10), rgba(0,200,83,0.06));
+  filter: blur(28px) saturate(120%);
+  opacity: 0.9;
+  transform: translateZ(-40px) scale(1.04);
+  pointer-events: none;
+}
+
+/* card surface */
+.receipt-top{ position: relative; z-index: 3; }
+.receipt-title{
+  margin: 0 0 6px 0;
+  font-size: 1.12rem;
+  color: var(--ink);
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+.receipt-meta{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* neon ref style */
+.neon-ref{
+  display:inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  background: linear-gradient(90deg, rgba(37,117,252,0.12), rgba(106,17,203,0.08));
+  color: var(--accent-b);
+  box-shadow: 0 8px 30px rgba(37,117,252,0.06);
+}
+
+/* body lines */
+.receipt-body{
+  margin-top: 12px;
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(12,18,28,0.06);
+  border: 1px solid rgba(12,18,28,0.04);
+  color: var(--muted);
+}
+.line{ margin: 6px 0; font-size: 0.98rem; color: var(--ink); }
+
+/* actions: tactile glass buttons */
+.receipt-actions{
+  margin-top: 14px;
+  display:flex;
+  gap: 12px;
+  justify-content: flex-start;
+  align-items: center;
+}
+.action-btn{
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  background: linear-gradient(90deg, var(--accent-b), var(--accent-c));
+  color: #041217;
+  box-shadow: 0 14px 46px rgba(37,117,252,0.10), 0 6px 18px rgba(12,18,28,0.06);
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms;
+}
+.action-btn.ghost{
+  background: transparent;
+  border: 1px solid rgba(12,18,28,0.06);
+  color: var(--muted);
+  box-shadow: none;
+}
+.action-btn:hover{ transform: translateY(-6px) scale(1.02); box-shadow: var(--deep-shadow); }
+
+/* footer small note */
+.payment-foot{ margin-top: 18px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+
+/* focus & hover 3D lift */
+.receipt-card:hover{ transform: translateY(-12px) rotateX(2deg); }
+.receipt-card:focus-within, .receipt-card:focus{ outline: none; transform: translateY(-14px) rotateX(2.2deg); box-shadow: var(--deep-shadow); }
+
+/* responsive */
+@media (max-width: 780px){
+  .receipt-holo{ inset: -12px -12px auto -12px; height: 120px; }
+  .receipt-card{ max-width: 92%; }
+  .payment-stage{ padding: 16px; }
+  .receipt-body{ padding: 12px; }
+  .action-btn{ padding: 10px 12px; min-width: 110px; }
+}
+/* ===== payment-details.css — refined styles for user, date, values ===== */
+
+/* container helper rows */
+.user-row{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content: space-between;
+  flex-wrap:wrap;
+}
+.user-col{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width: 160px;
+  max-width: 60%;
+}
+
+/* avatar chip (initials) */
+.user-avatar{
+  width:62px;
+  height:62px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: white;
+  background: linear-gradient(135deg, rgba(37,117,252,0.95), rgba(106,17,203,0.95));
+  box-shadow: 0 12px 36px rgba(37,117,252,0.12), 0 4px 12px rgba(12,18,28,0.06) inset;
+  transform: translateZ(0);
+  flex-shrink: 0;
+}
+
+/* user name and email */
+.user-name{
+  font-weight: 800;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.05;
+}
+.user-email{
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* paid date block (align right for rtl) */
+.paid-date{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
+  min-width: 160px;
+}
+.date-label{
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 700;
+  opacity: 0.95;
+}
+.date-value{
+  font-weight: 800;
+  font-size: 0.98rem;
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(39,109,250,0.04), rgba(106,17,203,0.03));
+  padding: 6px 10px;
+  border-radius: 10px;
+  box-shadow: 0 8px 26px rgba(37,117,252,0.04);
+}
+
+/* detail row */
+.detail-row{
+  margin-top: 12px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.detail-label{ min-width:80px; color:var(--muted); font-weight:700; }
+.detail-value{
+  flex:1 1 auto;
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(12,18,28,0.04);
+  box-shadow: 0 10px 28px rgba(12,18,28,0.04);
+  color: var(--ink);
+  font-weight:600;
+}
+
+/* amount row and badge (vivid and 3D) */
+.amount-row{
+  margin-top: 12px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content: flex-start;
+  flex-wrap:wrap;
+}
+.amount-label{ min-width:80px; color:var(--muted); font-weight:700; }
+.amount-value{ display:flex; align-items:center; gap:10px; }
+
+.amount-badge{
+  display:inline-block;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: #041217;
+  background: linear-gradient(90deg, rgba(37,117,252,0.18), rgba(0,200,83,0.14));
+  box-shadow: 0 18px 46px rgba(37,117,252,0.10), 0 6px 18px rgba(12,18,28,0.06);
+  border: 1px solid rgba(37,117,252,0.08);
+}
+
+/* currency small tag */
+.currency{
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-weight:700;
+}
+
+/* small responsive adjustments */
+@media (max-width:780px){
+  .user-row{ align-items:flex-start; }
+  .paid-date{ align-items:flex-start; margin-top:8px; width:100%; }
+  .user-col{ max-width: 100%; }
+  .amount-badge{ font-size: 1rem; padding: 8px 12px; }
+  .user-avatar{ width:52px; height:52px; font-size:0.95rem; border-radius:12px; }
+}
+
+/* focus accessibility */
+.user-avatar, .date-value, .amount-badge {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.user-avatar:focus, .date-value:focus, .amount-badge:focus {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 64px rgba(37,117,252,0.14);
+  outline: none;
+}
+
+/* optional subtle separator */
+.receipt-body > * + * { margin-top: 12px; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* best-rest.css — distinctive 3D cards for BestRestorant (light theme, harmonious) */
+
+:root{
+  --br-surface: #ffffff;
+  --br-muted: #6b7280;
+  --br-ink: #071422;
+  --br-accentA: var(--accent-purple, #6a11cb);
+  --br-accentB: var(--accent-blue, #2575fc);
+  --br-accentC: var(--accent-green, #00c853);
+  --br-radius: 16px;
+  --br-soft-shadow: 0 26px 60px rgba(12,18,28,0.08);
+  --br-lift-shadow: 0 46px 110px rgba(12,18,28,0.12);
+}
+
+/* panel */
+.best-rest-panel{
+  margin: 18px auto 30px;
+  padding: 18px;
+  max-width: 1200px;
+  border-radius: calc(var(--br-radius) + 6px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), #fbfdff);
+  box-shadow: 0 10px 30px rgba(12,18,28,0.04);
+  border: 1px solid rgba(12,18,28,0.04);
+  isolation: isolate;
+}
+
+/* header */
+.br-header{
+  display:flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+  direction: rtl;
+}
+.br-header h2{ margin:0; font-size: 1.2rem; color: var(--br-ink); }
+.br-note{ margin:0; color: var(--br-muted); font-size: 0.95rem; }
+
+/* messages */
+.br-error{ color: #9b1c1c; background: #fff0f0; padding: 8px 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid rgba(155,28,28,0.08); }
+.br-message{ color: var(--br-accentB); background: linear-gradient(90deg, rgba(37,117,252,0.06), rgba(106,17,203,0.04)); padding: 8px 12px; border-radius: 10px; margin-bottom: 8px; }
+
+/* grid */
+.br-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+/* card (3D stacked layers) */
+.br-card{
+  position: relative;
+  border-radius: 14px;
+  transform-style: preserve-3d;
+  transition: transform 300ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms;
+  cursor: default;
+  outline: none;
+  min-height: 220px;
+}
+
+/* colorful rim / glow behind card to separate it visually */
+.br-card::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  z-index: 0;
+  background: linear-gradient(120deg, rgba(106,17,203,0.04), rgba(37,117,252,0.04));
+  filter: blur(16px) saturate(120%);
+  opacity: 0.9;
+  transform: translateZ(-18px) scale(0.99);
+  pointer-events: none;
+}
+
+/* main surface */
+.br-card-top{ display:flex; gap:12px; align-items:flex-start; padding: 14px; position: relative; z-index: 2; }
+.br-title-wrap{ flex:1; min-width: 0; }
+.br-title{ margin:0; font-size:1.02rem; font-weight:900; color:var(--br-ink); }
+.br-desc{ margin:6px 0 0 0; color:var(--br-muted); font-size:0.92rem; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* badge (rank) */
+.br-badge{
+  position: absolute;
+  left: 14px; top: 10px; /* note RTL: left side accent */
+  z-index: 3;
+  background: linear-gradient(90deg, var(--br-accentA), var(--br-accentB));
+  color: white;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.82rem;
+  box-shadow: 0 10px 30px rgba(37,117,252,0.08);
+}
+
+/* media / avatar */
+.br-media{ width:78px; height:78px; border-radius: 12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background: linear-gradient(180deg,#fff,#fbfdff); border: 1px solid rgba(12,18,28,0.04); box-shadow: 0 8px 26px rgba(12,18,28,0.06); }
+.br-avatar{ width:56px; height:56px; border-radius: 10px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.25rem; color:white; background: linear-gradient(135deg, var(--br-accentB), var(--br-accentA)); box-shadow: 0 8px 26px rgba(37,117,252,0.08); }
+
+/* stats row */
+.br-stats{ display:flex; gap:12px; padding: 0 14px 12px 14px; z-index:2; }
+.br-stat{ flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+.br-stat-num{ font-weight:900; color:var(--br-ink); font-size:1rem; }
+.br-stat-label{ font-size:0.82rem; color:var(--br-muted); }
+
+/* actions */
+.br-actions{ display:flex; gap:10px; padding: 12px 14px 18px 14px; align-items:center; z-index:2; }
+.br-btn{
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 12px 34px rgba(12,18,28,0.06);
+}
+.br-btn.primary{
+  background: linear-gradient(90deg, var(--br-accentB), var(--br-accentC));
+  color: #041217;
+}
+.br-btn.ghost{
+  background: transparent;
+  border: 1px solid rgba(12,18,28,0.06);
+  color: var(--br-muted);
+}
+.br-link { text-decoration: none; display:inline-block; }
+
+/* hover/focus effects (3D lift) */
+.br-card:hover{ transform: translateY(-12px) rotateX(1.5deg); box-shadow: var(--br-lift-shadow); }
+.br-card:focus{ transform: translateY(-14px) rotateX(1.8deg); box-shadow: var(--br-lift-shadow); outline: none; }
+
+/* small empty state */
+.br-empty{ padding: 18px; color:var(--br-muted); background: linear-gradient(180deg, rgba(12,18,28,0.02), rgba(12,18,28,0.01)); border-radius: 12px; }
+
+/* loading text */
+.br-loading{ color: var(--br-muted); padding: 8px 0; }
+
+/* responsive */
+@media (max-width: 900px){
+  .br-card{ min-height: auto; }
+  .br-grid{ grid-template-columns: 1fr; }
+  .br-media{ width:64px; height:64px; }
+  .br-avatar{ width:48px; height:48px; font-size:1rem; }
+  .br-badge{ left: 12px; top: 8px; }
+}
+
+/* accessibility contrast boost option */
+@media (prefers-contrast: more){
+  .br-card::before{ opacity: 1; filter: blur(6px); }
+  .br-btn{ box-shadow: 0 18px 48px rgba(12,18,28,0.12); }
+}
+/* --- Enhanced stat boxes --- */
+.br-stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(145deg, #ffffff, #f1f3f9);
+  box-shadow: 0 4px 10px rgba(12, 18, 28, 0.08),
+              inset 0 2px 4px rgba(255,255,255,0.8);
+  padding: 10px 12px;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+.br-stat:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(37,117,252,0.18);
+}
+
+.br-icon {
+  color: var(--br-accentB);
+  filter: drop-shadow(0 2px 3px rgba(37,117,252,0.25));
+}
+
+.br-stat-num {
+  font-weight: 900;
+  color: var(--br-ink);
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.br-stat-label {
+  font-size: 0.8rem;
+  color: var(--br-muted);
+}
+
+/* specialized tints */
+.br-like { border-left: 4px solid #ff5f6d; }
+.br-order { border-left: 4px solid #00c853; }
+.br-phone { border-left: 4px solid #2575fc; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* user.css — 3D, tactile & responsive form for User component (light theme) */
+:root{
+  --u-bg: #ffffff;
+  --u-ink: #071422;
+  --u-muted: #6b7280;
+  --u-accentA: #2575fc; /* blue */
+  --u-accentB: #6a11cb; /* purple */
+  --u-radius: 14px;
+  --u-soft-shadow: 0 20px 56px rgba(7,18,34,0.08);
+  --u-deep-shadow: 0 42px 110px rgba(7,18,34,0.12);
+}
+
+/* Panel centered */
+.user-panel{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 28px 16px;
+  box-sizing: border-box;
+  width:100%;
+}
+
+/* The card — stacked, with layered pseudo-depth */
+.user-card{
+  width:100%;
+  max-width: 720px;
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  border-radius: calc(var(--u-radius) + 6px);
+  padding: 18px;
+  box-shadow: var(--u-soft-shadow);
+  border: 1px solid rgba(7,18,34,0.04);
+  position: relative;
+  overflow: visible;
+  transform-style: preserve-3d;
+  transition: transform 280ms cubic-bezier(.2,.9,.2,1), box-shadow 280ms;
+  perspective: 1200px;
+}
+
+/* decorative holographic rim (behind) */
+.user-card-decor{
+  position: absolute;
+  right: -24px;
+  top: -18px;
+  width: 260px;
+  height: 200px;
+  background: radial-gradient(280px 160px at 20% 20%, rgba(37,117,252,0.08), transparent 40%),
+              radial-gradient(220px 140px at 80% 80%, rgba(106,17,203,0.06), transparent 40%);
+  filter: blur(22px) saturate(110%);
+  z-index: 0;
+  pointer-events: none;
+  transform: translateZ(-40px) scale(1.02);
+}
+
+/* header area */
+.user-head{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 14px;
+}
+.user-avatar{
+  width:64px;
+  height:64px;
+  border-radius: 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  color: white;
+  background: linear-gradient(135deg, var(--u-accentA), var(--u-accentB));
+  box-shadow: 0 14px 40px rgba(37,117,252,0.09), inset 0 2px 8px rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.user-title{ margin:0; font-size:1.18rem; color:var(--u-ink); font-weight:900; }
+.user-sub{ margin:0; color:var(--u-muted); font-size:0.93rem; }
+
+/* form layout — grid two columns on wide screens */
+.user-form{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+  align-items: start;
+  position: relative;
+  z-index: 2;
+}
+
+/* field wrapper */
+.field{ display:flex; flex-direction:column; gap:8px; }
+
+/* label inside field — small and bold */
+.field-label{ font-weight:700; color:var(--u-muted); font-size:0.82rem; }
+
+/* input style — tactile, inset + neon rim on focus */
+.input-field{
+  width:100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(7,18,34,0.06);
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  box-shadow: 0 8px 24px rgba(7,18,34,0.04), inset 0 1px 0 rgba(255,255,255,0.7);
+  font-size: 0.98rem;
+  color: var(--u-ink);
+  outline: none;
+  transition: transform 160ms cubic-bezier(.2,.9,.2,1), box-shadow 160ms, border-color 160ms;
+}
+
+/* placeholder color */
+.input-field::placeholder{ color: rgba(107,114,128,0.4); font-weight:600; }
+
+/* focus: lift + subtle neon rim */
+.input-field:focus{
+  transform: translateY(-4px);
+  border-color: rgba(37,117,252,0.22);
+  box-shadow: 0 22px 54px rgba(7,18,34,0.08), 0 0 18px rgba(37,117,252,0.06);
+}
+
+/* make full-width single column on mobile */
+@media (max-width: 820px){
+  .user-form{ grid-template-columns: 1fr; }
+}
+
+/* form actions area */
+.form-actions{
+  grid-column: 1 / -1;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-top: 6px;
+}
+
+/* primary button — 3D tactile */
+.submit-btn{
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--u-accentA), var(--u-accentB));
+  color: #041217;
+  font-weight: 900;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 18px 46px rgba(37,117,252,0.10), 0 6px 18px rgba(7,18,34,0.06);
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms;
+}
+.submit-btn:hover{ transform: translateY(-6px) scale(1.02); box-shadow: var(--u-deep-shadow); }
+.submit-btn:active{ transform: translateY(-2px) scale(.995); }
+
+/* secondary button (ghost) */
+.reset-btn{
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid rgba(7,18,34,0.06);
+  color: var(--u-muted);
+  font-weight:700;
+  cursor: pointer;
+}
+
+/* message area */
+.form-message{
+  grid-column: 1 / -1;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 800;
+  color: #041217;
+  background: linear-gradient(90deg,#e0f2ff,#eaf7ff);
+  box-shadow: 0 12px 34px rgba(7,18,34,0.06);
+}
+
+/* keyboard accessibility & focus visual */
+.user-card:focus-within{ box-shadow: var(--u-deep-shadow); transform: translateY(-10px); outline: none; }
+
+/* small touch improvements */
+.input-field, .submit-btn, .reset-btn { -webkit-tap-highlight-color: transparent; }
+
+/* micro animation for card tilt based on hover */
+.user-card:hover{ transform: translateY(-10px) rotateX(1.2deg); box-shadow: var(--u-deep-shadow); }
+
+/* responsive tweaks */
+@media (max-width: 480px){
+  .user-avatar{ width:52px; height:52px; font-size:0.95rem; border-radius:10px; }
+  .user-title{ font-size:1rem; }
+  .form-actions{ flex-direction: column; align-items: stretch; gap:8px; }
+  .submit-btn, .reset-btn{ width:100%; justify-content:center; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* food-res.css — improved 3D restaurant list (light theme) */
+
+:root {
+  --fr-bg: #f7fafc;
+  --fr-surface: #ffffff;
+  --fr-ink: #071422;
+  --fr-muted: #6b7280;
+  --fr-accent1: #6a11cb; /* purple */
+  --fr-accent2: #2575fc; /* blue */
+  --fr-radius: 16px;
+  --fr-soft-shadow: 0 20px 60px rgba(8,12,20,0.08);
+  --fr-deep-shadow: 0 46px 120px rgba(8,12,20,0.12);
+}
+
+/* shell */
+.fr-shell {
+  padding: 28px 18px;
+  min-height: 70vh;
+  background: linear-gradient(180deg, var(--fr-bg), #fff);
+  box-sizing: border-box;
+}
+
+/* toolbar */
+.fr-toolbar {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.fr-back {
+  background: linear-gradient(90deg, rgba(37,117,252,0.12), rgba(106,17,203,0.08));
+  border: none;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(37,117,252,0.08);
+  transition: transform 0.2s ease;
+}
+.fr-back:hover {
+  transform: translateY(-2px);
+}
+.fr-title h2 {
+  margin: 0;
+  color: var(--fr-ink);
+  font-size: 1.3rem;
+}
+.fr-sub {
+  color: var(--fr-muted);
+  font-size: 0.95rem;
+  margin-top: 2px;
+}
+
+/* grid of cards */
+.fr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* card */
+.fr-card {
+  position: relative;
+  border-radius: var(--fr-radius);
+  overflow: visible;
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(.2,.9,.2,1), box-shadow 0.35s;
+  cursor: pointer;
+  perspective: 1200px;
+}
+.fr-card-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--fr-radius);
+  background: linear-gradient(120deg, rgba(106,17,203,0.06), rgba(37,117,252,0.06));
+  filter: blur(18px) saturate(110%);
+  transform: translateZ(-20px) scale(0.99);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* card body */
+.fr-card-body {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, var(--fr-surface), #fbfdff);
+  border-radius: var(--fr-radius);
+  padding: 18px;
+  box-shadow: var(--fr-soft-shadow);
+  border: 1px solid rgba(12,18,28,0.05);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 0.2s ease;
+}
+.fr-card:hover {
+  transform: translateY(-12px) rotateX(1.6deg) rotateY(-1.2deg);
+  box-shadow: var(--fr-deep-shadow);
+}
+
+/* name & description */
+.fr-name {
+  margin: 0;
+  font-weight: 900;
+  color: var(--fr-ink);
+  font-size: 1.1rem;
+}
+.fr-desc {
+  margin: 0;
+  color: var(--fr-muted);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  max-height: 3.6em;
   overflow: hidden;
 }
 
-.card-meta{
-  display:flex;
-  gap:0.5rem;
-  margin-top:0.9rem;
-  align-items:center;
+/* meta */
+.fr-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.fr-meta-left, .fr-meta-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--fr-muted);
+}
+.fr-phone, .fr-stars, .fr-orders, .fr-likes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(250,250,255,0.95);
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(12,18,28,0.03);
+  font-size: 0.9rem;
 }
 
-.tag{
-  background: rgba(255,255,255,0.03);
-  padding: 0.28rem 0.58rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.88);
-  border: 1px solid rgba(255,255,255,0.03);
+/* price */
+.fr-price {
+  font-weight: 800;
+  color: var(--fr-ink);
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(37,117,252,0.06), rgba(0,200,83,0.04));
+  display: inline-block;
+  margin-top: 6px;
 }
 
-/* accent underline for title */
-.card-title::after{
-  content: '';
-  display: block;
-  width: 46px;
-  height: 3px;
-  margin-top: 0.6rem;
-  border-radius: 4px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.06), var(--accent));
+/* actions */
+.fr-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+.fr-btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 12px 34px rgba(12,18,28,0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.fr-btn:first-child {
+  background: linear-gradient(90deg, var(--fr-accent2), var(--fr-accent1));
+  color: #041217;
+}
+.fr-btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(12,18,28,0.06);
+  color: var(--fr-muted);
+}
+.fr-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--fr-deep-shadow);
 }
 
-.empty-placeholder{
-  grid-column: 1 / -1;
+/* empty & loader */
+.fr-empty {
+  padding: 20px;
   text-align: center;
-  padding: 2rem;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border: 1px dashed rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.78);
+  color: var(--fr-muted);
+  background: linear-gradient(180deg, rgba(12,18,28,0.02), rgba(12,18,28,0.01));
+  border-radius: 12px;
 }
-
-/* RESPONSIVE */
-@media (max-width: 1024px){
-  .food-carousel{ grid-auto-columns: minmax(280px, 1fr); }
-  .card-avatar{height:190px}
-}
-
-@media (max-width: 768px){
-  .food-carousel{grid-auto-columns: minmax(260px, 86vw); gap: 0.9rem}
-  .card-avatar{height:170px}
-  .card-title{font-size:1.04rem}
-  .card-desc{font-size:0.92rem}
-}
-
-@media (max-width: 480px){
-  .food-section{padding:1.2rem 0.6rem}
-  .food-message{font-size:0.98rem}
-  .food-carousel{gap:0.8rem}
-  .food-card{border-radius:12px}
-  .card-avatar{height:150px}
-}
-
-/* quick helper: change accent color dynamically via attribute or class */
-.food-section[data-accent] { --accent: attr(data-accent color); }
-
-/* پایان */
-
-
-
-
-
-
-
-
-
-
-
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
-
-.restorant-section {
-  background: linear-gradient(160deg, #101820, #182c28);
-  color: #f3f3f3;
-  padding: 2rem 1rem;
-  font-family: "Inter", sans-serif;
-  direction: rtl;
-}
-
-.res-loading,
-.res-message,
-.res-error {
+.fr-loader {
   text-align: center;
-  font-size: 1rem;
+  padding: 40px;
+  color: var(--fr-muted);
 }
 
-.res-error {
-  color: #ff7070;
+/* responsive */
+@media (max-width: 820px) {
+  .fr-grid {
+    grid-template-columns: 1fr;
+  }
+  .fr-card-body {
+    min-height: 180px;
+    padding: 14px;
+  }
+}
+/* meta (phone, stars, likes) */
+.fr-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* left side: phone & stars */
+.fr-meta-left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.fr-phone, .fr-stars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.95rem;
   font-weight: 600;
+  color: #1f2937;
+  background: #f1f5f9;
+  border: 1px solid rgba(12,18,28,0.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.restorant-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+/* right side: likes */
+.fr-meta-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-.restorant-card {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  padding: 1.2rem;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+.fr-likes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ef4444;
+  background: #fff1f1;
+  border: 1px solid rgba(239,68,68,0.3);
+  box-shadow: 0 2px 6px rgba(239,68,68,0.15);
 }
 
-.restorant-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+.fr-card-body {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, #ffffff 0%, #f9f9fb 100%);
+  border-radius: var(--fr-radius);
+  padding: 18px;
+  box-shadow: var(--fr-soft-shadow);
+  border: 1px solid rgba(12,18,28,0.05);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  /* subtle pattern برای وسط کارت */
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(240,240,245,0.05) 0,
+    rgba(240,240,245,0.05) 1px,
+    transparent 1px,
+    transparent 8px
+  );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================
+   res-title — جذاب، لوکس و خوانا
+   جایگزین نسخهٔ قبلی
+   ============================ */
 
 .res-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #a3ffcb;
-  margin-bottom: 0.4rem;
+  font-family: "Vazirmatn", "YekanBakh", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.6rem;           /* بزرگ‌تر برای نمایش واضح */
+  font-weight: 900;
+  line-height: 1.05;
+  margin: 0 0 8px 0;
+  text-align: center;
+  letter-spacing: 0.2px;
+  cursor: default;
+
+  /* پایه رنگی ملایم و غیرِ خسته‌کننده (مشکیِ خام حذف شد) */
+  color: #062b3a; /* deep navy — خواناتر از سیاه */
+  /* subtle embossed + crisp outline برای خوانایی روی هر بک‌گراند */
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.65),    /* very light top highlight */
+    0 6px 18px rgba(5, 20, 30, 0.14);   /* soft depth shadow */
+
+  /* پیش‌نمایش هایلایت (هنوز متن با رنگ خوانا است) */
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: transform 220ms ease, text-shadow 220ms ease;
 }
 
-.res-desc {
-  font-size: 0.95rem;
-  color: #ddd;
-  margin-bottom: 0.5rem;
+/* یک خط زیرین شیک مثل نشانِ پرستیژ */
+.res-title::after{
+  content: "";
+  display: block;
+  width: 48px;
+  height: 4px;
+  margin: 8px auto 0;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #ffd166 0%, #ff9a00 50%, #ffd166 100%);
+  box-shadow: 0 6px 18px rgba(255,160,40,0.15);
+  transition: transform 220ms ease, opacity 220ms;
+  opacity: 0.95;
 }
 
-.res-phone {
-  font-size: 0.9rem;
-  color: #8fe3a6;
+/* Hover — گرادینت حرکت‌کننده و برجسته‌تر شدن */
+.res-title:hover,
+.res-title:focus {
+  transform: translateY(-3px) scale(1.02);
+  text-shadow:
+    0 2px 0 rgba(255,255,255,0.75),
+    0 10px 34px rgba(5, 30, 50, 0.20);
 }
 
-.res-likes {
-  font-size: 0.9rem;
-  color: #ff8b8b;
-  margin-bottom: 0.6rem;
+/* optional: animated golden shimmer on hover (subtle) */
+.res-title:hover::after {
+  transform: translateY(-2px) scaleX(1.08);
+  opacity: 1;
 }
 
-.res-btn {
-  background: linear-gradient(90deg, #00bfa6, #00ff87);
-  border: none;
-  color: #081518;
-  font-weight: 600;
+/* responsive */
+@media (max-width: 900px) {
+  .res-title { font-size: 1.36rem; }
+}
+@media (max-width: 420px) {
+  .res-title { font-size: 1.18rem; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.br-btn.primary {
+  padding: 10px 14px;
   border-radius: 10px;
-  padding: 0.5rem 1.2rem;
+  background: linear-gradient(90deg,#ff9f43,#ff6b6b); /* رنگ جذاب مثل رستوران */
+  color: #071222;
+  font-weight: 800;
+  border: none;
   cursor: pointer;
-  transition: background 0.4s;
+  box-shadow: 0 14px 40px rgba(255,120,80,0.08);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
 
-.res-btn:hover {
-  background: linear-gradient(90deg, #00ff87, #00bfa6);
+.br-btn.primary:hover {
+  transform: translateY(-3px); /* بالا رفتن ساده */
+  box-shadow: 0 22px 56px rgba(255,120,80,0.12); /* سایه بزرگتر */
 }
 
-.res-empty {
-  text-align: center;
-  font-size: 1rem;
-  opacity: 0.7;
-  padding: 2rem 0;
+.br-btn.primary:active {
+  transform: translateY(0);
+  box-shadow: 0 14px 40px rgba(255,120,80,0.08);
+}
+
+
+
+
+
+
+
+
+.res-title2 {
+  font-size: 2rem;        /* بزرگ‌تر */
+  font-weight: 900;       /* ضخیم و پررنگ */
+  color: #1a1a1a;         /* یک مشکی کمی گرم‌تر و شیک‌تر */
+  line-height: 1.2;
+  margin: 0 0 12px 0;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.1); /* کمی سایه برای برجسته‌تر شدن */
 }
 
 
@@ -307,65 +5177,183 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-.home-page {
-  display: flex;
-  flex-direction: column;
+/* ===== Logout button: premium 3D style ===== */
+.btn.logout-btn,
+.nav-right .btn.profile-btn.logout-btn {
+  --bg-a: #ff7a7a;
+  --bg-b: #ffb86b;
+  --text: #081018;
+  display: inline-flex;
   align-items: center;
-  background: radial-gradient(circle at top left, #071422, #0b1d1b);
+  gap: 10px;
+  padding: 10px 14px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--bg-a), var(--bg-b));
+  color: var(--text);
+  box-shadow:
+    0 8px 22px rgba(255,120,90,0.12),
+    0 2px 0 rgba(255,255,255,0.18) inset;
+  transform: translateZ(0);
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms ease, filter 160ms ease;
+  text-decoration: none;
+}
+
+/* icon on the left (uses emoji fallback) */
+.btn.logout-btn::before {
+  content: "⎋"; /* می‌تونی به "🔓" یا "🚪" یا SVG تغییر بدی */
+  display: inline-block;
+  font-size: 1.02rem;
+  line-height: 1;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.18);
+  box-shadow: 0 6px 18px rgba(255,255,255,0.06) inset;
+  color: var(--text);
+}
+
+/* hover: بلند شدن و افزایش درخشش */
+.btn.logout-btn:hover,
+.nav-right .btn.profile-btn.logout-btn:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 60px rgba(255,120,90,0.16),
+    0 2px 0 rgba(255,255,255,0.18) inset;
+  filter: saturate(1.05);
+}
+
+/* active (فشار دادن): فطری و سریع */
+.btn.logout-btn:active {
+  transform: translateY(-2px) scale(0.996);
+  box-shadow: 0 8px 28px rgba(255,120,90,0.12);
+}
+
+/* focus: دسترس‌پذیری کیبورد */
+.btn.logout-btn:focus,
+.btn.logout-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 20px 60px rgba(255,120,90,0.14),
+    0 0 0 6px rgba(255,184,120,0.10);
+}
+
+/* small screens: پرمحتواتر و پهن‌تر */
+@media (max-width: 520px) {
+  .btn.logout-btn {
+    padding: 12px 16px;
+    font-size: 1rem;
+  }
+  .btn.logout-btn::before { padding: 7px; }
+}
+
+/* ===== fallback: اگر نخواستی کلاس اضافه کنی (انتخابی)
+   این قاعده آخرین دکمه profile-btn در nav-right رو هدف می‌گیره */
+.nav-right .btn.profile-btn:last-child:not(.logout-btn) {
+  /* apply a slightly toned-down variant so it won't override orders btn */
+  --bg-a: #ff8f8f;
+  --bg-b: #ffc79a;
+  background: linear-gradient(90deg, var(--bg-a), var(--bg-b));
+  color: var(--text);
+  border-radius: 999px;
+  box-shadow: 0 8px 26px rgba(255,130,90,0.10);
+}
+
+
+
+
+
+
+/* ===== پایه برای همه دکمه‌های Navbar ===== */
+.btn.nav-btn {
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transform: translateZ(0);
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1),
+              box-shadow 180ms ease,
+              filter 160ms ease,
+              background 200ms ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* ===== ورود ===== */
+.btn.login-btn {
+  background: linear-gradient(90deg, #6c63ff, #8360c3);
   color: #fff;
-  min-height: 100vh;
+  box-shadow: 0 8px 24px rgba(108,99,255,0.2);
+}
+.btn.login-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(108,99,255,0.28);
+  filter: saturate(1.1);
 }
 
-.home-header {
-  text-align: center;
-  padding: 2rem 1rem 1rem;
+/* ===== ثبت‌نام ===== */
+.btn.register-btn {
+  background: linear-gradient(90deg, #ff758c, #ff7eb3);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(255,117,140,0.2);
+}
+.btn.register-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(255,117,140,0.28);
+  filter: saturate(1.1);
 }
 
-.home-header h1 {
-  font-size: 2rem;
-  color: #00ff99;
+/* ===== رزروها ===== */
+.btn.orders-btn {
+  background: linear-gradient(90deg, #4ade80, #16a34a);
+  color: #081018;
+  box-shadow: 0 8px 24px rgba(74,222,128,0.25);
+}
+.btn.orders-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(74,222,128,0.35);
+  filter: saturate(1.1);
 }
 
-.home-header p {
-  font-size: 1rem;
-  color: #aaa;
+/* ===== بیرون رفتن ===== */
+.btn.logout-btn {
+  background: linear-gradient(90deg, #ff7a7a, #ffb86b);
+  color: #081018;
+  box-shadow: 0 8px 22px rgba(255,120,90,0.12),
+              0 2px 0 rgba(255,255,255,0.18) inset;
+}
+.btn.logout-btn:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(255,120,90,0.16),
+              0 2px 0 rgba(255,255,255,0.18) inset;
+  filter: saturate(1.05);
 }
 
-.home-content {
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  width: 100%;
-  max-width: 1300px;
-  padding: 1rem;
+/* ===== حالت فعال و فشرده شدن ===== */
+.btn.nav-btn:active {
+  transform: translateY(-2px) scale(0.996);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
 }
 
+/* ===== focus ===== */
+.btn.nav-btn:focus,
+.btn.nav-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.15), 0 12px 28px rgba(0,0,0,0.14);
+}
 
-
-
-
-@media (max-width: 768px) {
-  .food-card,
-  .restorant-card {
-    min-width: 90vw; /* عرض کارت روی موبایل */
-  }
-
-  .food-section,
-  .restorant-section {
-    padding: 12px;
-  }
-
-  h1, h2, h3 {
-    font-size: clamp(1rem, 4vw, 1.4rem);
+/* ===== واکنش‌گرا ===== */
+@media (max-width: 520px) {
+  .btn.nav-btn {
+    padding: 12px 18px;
+    font-size: 1rem;
   }
 }

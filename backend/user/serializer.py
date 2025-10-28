@@ -29,10 +29,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('full_name','email')
+        fields = ('id','full_name','email')
 
         
 class CommentSerializer(serializers.ModelSerializer):
+
+    user =  UserSerializer(read_only=True)
     class Meta:
         model = Comment
         fields = ('user','res','description','created_time','is_approved')

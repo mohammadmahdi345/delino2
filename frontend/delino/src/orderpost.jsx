@@ -3,42 +3,16 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
 const OrderPost = () => {
-  const { resId, foodId } = useParams(); // از Route: /orderpost/:resId/:foodId
+  const { resId, foodId } = useParams(); 
   const navigate = useNavigate();
 
-  const [foodName, setFoodName] = useState(""); // اختیاری: اسم غذا برای نمایش
+  const [foodName, setFoodName] = useState(""); 
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
 
-  // اگر می‌خوای اسم غذا/رستوران رو نشون بدی، می‌تونی اینجا fetch کنی.
-{/*useEffect(() => {
-    const loadFood = async () => {
-      try {
-        // فرض: endpoint رستوران شامل لیست foods هست، یا endpoint جدا برای food وجود دارد
-        const res = await axios.get(`http://localhost:8004/restorant/${resId}/`);
-        const foods = res.data.foods || [];
-        const matched = foods.find(f => String(f.id) === String(foodId));
-        if (matched) {
-          setFoodName(matched.name);
-        } else {
-          // اگر پیدا نشد، می‌خواهی اسم رو از یک endpoint food بگیری:
-          try {
-            const f = await axios.get(`http://localhost:8004/food/${foodId}/`);
-            setFoodName(f.data.name || "");
-          } catch {
-            setFoodName("");
-          }
-        }
-      } catch (err) {
-        console.error("خطا در دریافت نام غذا:", err);
-      }
-    };
-    loadFood();
-  }, [resId, foodId]);*/}
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // validation ساده
+
     if (!foodId || !resId) {
       setMessage("خطا: شناسه غذا یا رستوران موجود نیست.");
       return;
@@ -49,7 +23,6 @@ const OrderPost = () => {
     }
 
     try {
-      // --- راه پیشنهادی: POST به /order/ و ارسال res و food در body ---
       const response = await axios.post(
         `http://localhost:8004/order/${resId}/`,
         {
@@ -59,8 +32,7 @@ const OrderPost = () => {
       );
 
       setMessage("سفارش با موفقیت ثبت شد ✅");
-      // بعد از موفقیت می‌تونی کاربر رو به صفحه لیست سفارش‌ها بفرستی:
-      navigate("/foods");
+      navigate("/orders");
     } catch (error) {
       console.error(error.response?.data || error);
       const errMsg =
@@ -72,27 +44,29 @@ const OrderPost = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>ثبت سفارش</h2>
-      <p>رستوران: {resId}</p>
-      <p>غذا: {foodName || `#${foodId}`}</p>
+    <div className="orderpost-container">
+      <h2 className="orderpost-title">ثبت سفارش</h2>
+      <p className="orderpost-info">رستوران: {resId}</p>
+      <p className="orderpost-info">غذا: {foodName || `#${foodId}`}</p>
 
-      <form onSubmit={handleSubmit}>
-        <label>تعداد:</label>
+      <form onSubmit={handleSubmit} className="orderpost-form">
+        <label className="orderpost-label">تعداد:</label>
         <input
           type="number"
           min="1"
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
-          style={{ marginLeft: 8, marginBottom: 12 }}
+          className="orderpost-input"
         />
 
         <div>
-          <button type="submit">ثبت سفارش</button>
+          <button type="submit" className="orderpost-button">
+            ثبت سفارش
+          </button>
         </div>
       </form>
 
-      {message && <p style={{ marginTop: 12 }}>{message}</p>}
+      {message && <p className="orderpost-message">{message}</p>}
     </div>
   );
 };

@@ -15,6 +15,7 @@ urlpatterns = [
     path('best-restorant/', BestSellingRestaurantsAPIView.as_view(), name='poplar res'),
     path('order/<int:pk>/', OrderPostView.as_view(), name='order'),
     path('orders/', OrderView.as_view(), name='orders'),
+    path('food/res/<int:pk>/',FoodResView.as_view(),name='food-res')
     # path('profile/',ProfileView.as_view(),name='profile'),
     # path('orders/',OrderView.as_view(),name='orders'),
     # path('order-detail/',OrderDetail.as_view(),name='order-detail'),

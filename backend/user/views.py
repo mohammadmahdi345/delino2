@@ -31,12 +31,14 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         phone_number = serializer.validated_data['phone_number']
-        password = serializer.validated_data['password']
+        #password = serializer.validated_data['password']
 
         if User.objects.filter(phone_number=phone_number).exists():
             return Response({'detail': 'user already exists'}, status=400)
 
-        user = User.objects.create_user(phone_number=phone_number, password=password)
+        #user = User.objects.create_user(phone_number=phone_number, password=password)
+
+        user = serializer.save()
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)

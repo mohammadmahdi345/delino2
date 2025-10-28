@@ -24,10 +24,15 @@ class GateWayView(viewsets.ReadOnlyModelViewSet):
 class PaymentView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self,request,pk):
+    def post(self, request, pk):
         gateway = Gateway.objects.first()
+        order = get_object_or_404(Order, pk=pk)
 
-        order = get_object_or_404(Order,pk=pk)
+        # جلوگیری از پرداخت تکراری 🔹
+        if Payment.objects.filter(order=order, is_paid=True).exists():
+            return Response({
+                'detail': 'این سفارش قبلاً پرداخت شده است ✅'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         payment = Payment.objects.create(
             gateway=gateway,
@@ -41,7 +46,9 @@ class PaymentView(APIView):
         if is_paid:
             payment.is_paid = True
             payment.order.status = 'DELIVERED'
+            payment.order.save()  # 🔹 باید ذخیره بشه
             payment.save()
+
             return Response({
                 'detail': 'پرداخت با موفقیت انجام شد ✅',
                 'user': {
@@ -52,7 +59,7 @@ class PaymentView(APIView):
                 'paid_at': payment.paid_at,
                 'ref_id': payment.ref_id,
                 'pk': pk,
+                'amount': order.total_price(),
             }, status=status.HTTP_201_CREATED)
-
 
 
