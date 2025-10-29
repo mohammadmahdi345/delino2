@@ -10,9 +10,35 @@ const Home = () => {
         <p>بهترین رستوران‌ها و غذاهای محلی نزدیک را کشف کنید</p>
       </header>
 
-      <section className="home-content">
-        <BestRestorant />
+
+      {/* Best / featured restorant (kept where it was) */}
+      <BestRestorant />
+
+      <section className="home-content container">
+        {/* label above Food */}
+        <section
+          className="section-label section-label-food"
+          aria-labelledby="label-food"
+        >
+          <h3 id="label-food" className="label-title">
+            غذاهای محبوب
+          </h3>
+          <p className="label-subtitle">طعم‌هایی که مردم همین امروز سفارش می‌دهند</p>
+        </section>
+
         <Food />
+
+        {/* label above Restorant */}
+        <section
+          className="section-label section-label-res"
+          aria-labelledby="label-res"
+        >
+          <h3 id="label-res" className="label-title">
+            رستوران‌های منتخب
+          </h3>
+          <p className="label-subtitle">مکان‌هایی که نباید از دست بدهید</p>
+        </section>
+
         <Restorant />
       </section>
     </main>

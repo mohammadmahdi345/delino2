@@ -24,7 +24,7 @@ from .models import Restorant, Food, MenuItem  # مطمئن شو importها در
 
 class Search(APIView):
     def post(self, request, name):
-        # ۱. پیدا کردن رستوران‌هایی که خودشون اسمشون شامل name هست
+        # ۱. پیدا کردن رستوران‌هایی که اسمشون شامل name هست
         restorants = Restorant.objects.filter(name__icontains=name)
 
         # ۲. پیدا کردن غذاهایی که اسمشون شامل name هست
@@ -43,20 +43,30 @@ class Search(APIView):
 
         # ۴. برای هر غذا، پیدا کردن رستوران‌هایی که اون غذا رو دارند
         food_data = []
+        seen_foods = set()  # ✅ برای جلوگیری از تکرار
+
         for f in foods:
-            # همه‌ی منوهایی که این غذا رو دارند
-            menus = MenuItem.objects.filter(food=f).select_related("restorant")
-            for menu in menus:
+            if f.id in seen_foods:
+                continue  # اگه قبلاً این غذا اضافه شده، ردش کن
+
+            menu = (
+                MenuItem.objects.filter(food=f)
+                .select_related("restorant")
+                .first()  # فقط اولین رستوران رو بگیر (اگه مهم نیست کدوم)
+            )
+            if menu:
                 food_data.append({
                     "id": f.id,
                     "name": f.name,
                     "type": "food",
                     "description": f.description,
-                    "restorant_id": menu.restorant.id,   # ✅ حالا درست شد
-                    "restorant_name": menu.restorant.name,  # اختیاری
+                    "restorant_id": menu.restorant.id,
+                    "restorant_name": menu.restorant.name,
                 })
+                seen_foods.add(f.id)
 
         return Response(rest_data + food_data)
+
 
 
 
